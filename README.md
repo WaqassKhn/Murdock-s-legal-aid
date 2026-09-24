@@ -8,7 +8,7 @@ An evidence-first legal document review application with private workspaces, sou
 
 Legal documents often hide practical responsibilities in long clauses. LegalLens turns those clauses into a cited review, questions, comparisons and a personal preparation checklist. Every uploaded document remains the source of truth; user notes and system interpretations are labeled separately.
 
-**Source repository:** [WaqassKhn/Murdock-s-legal-aid](https://github.com/WaqassKhn/Murdock-s-legal-aid). Publication authorized on 2026-09-25. Public repository metadata is accessible without authentication; source publication and fresh-clone checks are being finalized. This repository is the submission artifact; no competition entry has been submitted automatically.
+**Source repository:** [WaqassKhn/Murdock-s-legal-aid](https://github.com/WaqassKhn/Murdock-s-legal-aid). Published on 2026-09-25. Repository metadata, README and source are readable without authentication; a credential-disabled fresh clone and clean dependency installation/build/tests succeeded. See [publication verification](docs/PUBLICATION.md) and [GitHub Actions](https://github.com/WaqassKhn/Murdock-s-legal-aid/actions). This repository is the submission artifact; no competition entry has been submitted automatically.
 
 ## Start locally
 

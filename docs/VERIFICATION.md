@@ -1,5 +1,7 @@
 # Verification record
 
+**Publication update (2026-09-25):** source is now public; unauthenticated access, a fresh clone, dependency installation and fresh-clone tests/build are verified. See [PUBLICATION.md](PUBLICATION.md). Earlier local-only statements below are historical.
+
 Verified locally on Windows with Python 3.12 and Node 22. Repository began empty; no prior behavior or tests were replaced. No deployment, commit or external publication was performed.
 
 ## Executed evidence

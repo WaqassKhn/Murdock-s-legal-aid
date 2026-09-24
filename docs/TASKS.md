@@ -31,3 +31,12 @@ User explicitly requested pushing to the new public repository `https://github.c
 Proof: prior 70 PostgreSQL/OCR backend tests, 10 frontend tests, two production browser workflows, build/lint/evaluation and independent Review Gate PASS remain applicable; only shipping notes change. Rollback: retain the local commit and use a normal follow-up revert if needed; no force-push or database changes.
 
 Next / upcoming task: publish main and verify a fresh unauthenticated clone.
+
+## Publication completed
+
+- [x] Public source pushed to `WaqassKhn/Murdock-s-legal-aid`, branch `main`.
+- [x] Unauthenticated repository/README/source access and credential-disabled fresh clone verified.
+- [x] Fresh locked dependency installation, 68 backend tests (two host OCR skips), eight evaluation/tooling tests and frontend production build passed.
+- [x] Fresh-clone size/history/secret checks recorded in PUBLICATION.md.
+
+GitHub Actions final container check was pending at handoff preparation; use the linked live status. No competition form was submitted. Next / upcoming task: none — authorized publication sequence complete.
