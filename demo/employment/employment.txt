@@ -1,0 +1,28 @@
+SYNTHETIC DEMO — Not a real agreement; created solely for product evaluation.
+
+EMPLOYMENT AGREEMENT
+This agreement is between Northstar Studio (Employer) and Alex Morgan (Employee).
+
+1. Effective date
+The effective date is 2026-10-01. Employment continues until terminated under section 4.
+
+2. Payment
+Employer shall pay Employee USD 5,000 monthly. Employer must reimburse approved expenses within 30 days after receipt of an expense statement.
+
+3. Intellectual property
+Employer owns work product created by Employee in the course of employment. Employee must disclose inventions made in the course of employment to Employer. The treatment of inventions created outside working hours is not specified.
+
+4. Termination and notice
+Either party may terminate employment with written notice at least 30 days before the proposed termination date. Employee must return Employer equipment within 7 days after termination. No calendar termination date is stated.
+
+5. Confidentiality
+Employee must not disclose Employer confidential business information to third parties. This obligation survives termination for 24 months. Information already publicly available is excluded.
+
+6. Non-compete
+Employee must not work for a competing business within the City of Harbor for 6 months after termination. The agreement does not define competing business.
+
+7. Governing law
+This agreement is governed by the laws of England and Wales.
+
+8. Dispute resolution
+The parties shall first attempt mediation before commencing court proceedings.

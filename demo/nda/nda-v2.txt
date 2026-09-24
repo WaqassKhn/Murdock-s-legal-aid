@@ -1,0 +1,25 @@
+SYNTHETIC DEMO — Not a real agreement; created solely for product evaluation.
+
+NON-DISCLOSURE AGREEMENT — VERSION 2
+This agreement is between Horizon Labs (Discloser) and Beacon Design (Recipient).
+
+1. Effective date
+The effective date is 2026-11-01.
+
+2. Confidentiality scope
+Confidential Information means all written, oral, visual, and unmarked information disclosed during project discussions. Recipient must protect Confidential Information and use it only to evaluate the proposed project. Publicly available information is excluded.
+
+3. Duration
+Recipient must maintain confidentiality for 36 months after disclosure.
+
+4. Liability
+Recipient liability for breach is unlimited and includes any and all losses.
+
+5. Governing law
+This agreement is governed by the laws of the State of New York.
+
+6. Return of information
+Recipient must return confidential materials within 7 days after written request.
+
+7. Survival
+Recipient confidentiality obligations survive termination of discussions.

@@ -1,0 +1,181 @@
+{
+  "measured_at_utc": "2026-09-23T08:13:05.442646+00:00",
+  "conditions": {
+    "os": "Windows",
+    "os_release": "11",
+    "machine": "AMD64",
+    "python": "3.12.14",
+    "logical_cpus": 16,
+    "fastapi": "0.141.1",
+    "sqlalchemy": "2.0.43",
+    "mode": "Offline deterministic extractive analysis; local concept vectors and BM25",
+    "transport": "FastAPI TestClient in process; no browser, HTTP network, TLS, OCR, or live model latency",
+    "storage": "Temporary SQLite database and files; deleted at exit",
+    "ingestion_poll_interval_ms": 10,
+    "concurrency": "Sequential API requests; application background processing thread",
+    "repetitions_per_question": 3
+  },
+  "ingestion": [
+    {
+      "file": "demo/employment/employment.txt",
+      "source_bytes": 1523,
+      "elapsed_ms": 78.645,
+      "status": "ready",
+      "pages": 1,
+      "clauses": 9
+    },
+    {
+      "file": "demo/nda/nda-v1.txt",
+      "source_bytes": 839,
+      "elapsed_ms": 46.701,
+      "status": "ready",
+      "pages": 1,
+      "clauses": 7
+    },
+    {
+      "file": "demo/nda/nda-v2.txt",
+      "source_bytes": 998,
+      "elapsed_ms": 47.807,
+      "status": "ready",
+      "pages": 1,
+      "clauses": 8
+    },
+    {
+      "file": "demo/rental/rental.txt",
+      "source_bytes": 1300,
+      "elapsed_ms": 49.778,
+      "status": "ready",
+      "pages": 1,
+      "clauses": 9
+    }
+  ],
+  "questions": [
+    {
+      "file": "employment.txt",
+      "question": "Can I terminate this agreement early?",
+      "repeat": 1,
+      "elapsed_ms": 12.262,
+      "abstained": false,
+      "verified_citations": 1
+    },
+    {
+      "file": "employment.txt",
+      "question": "Can I terminate this agreement early?",
+      "repeat": 2,
+      "elapsed_ms": 8.051,
+      "abstained": false,
+      "verified_citations": 1
+    },
+    {
+      "file": "employment.txt",
+      "question": "Can I terminate this agreement early?",
+      "repeat": 3,
+      "elapsed_ms": 7.831,
+      "abstained": false,
+      "verified_citations": 1
+    },
+    {
+      "file": "rental.txt",
+      "question": "Is there an automatic renewal?",
+      "repeat": 1,
+      "elapsed_ms": 9.966,
+      "abstained": false,
+      "verified_citations": 1
+    },
+    {
+      "file": "rental.txt",
+      "question": "Is there an automatic renewal?",
+      "repeat": 2,
+      "elapsed_ms": 7.657,
+      "abstained": false,
+      "verified_citations": 1
+    },
+    {
+      "file": "rental.txt",
+      "question": "Is there an automatic renewal?",
+      "repeat": 3,
+      "elapsed_ms": 7.592,
+      "abstained": false,
+      "verified_citations": 1
+    },
+    {
+      "file": "nda-v1.txt",
+      "question": "What information must remain confidential?",
+      "repeat": 1,
+      "elapsed_ms": 7.124,
+      "abstained": false,
+      "verified_citations": 3
+    },
+    {
+      "file": "nda-v1.txt",
+      "question": "What information must remain confidential?",
+      "repeat": 2,
+      "elapsed_ms": 6.71,
+      "abstained": false,
+      "verified_citations": 3
+    },
+    {
+      "file": "nda-v1.txt",
+      "question": "What information must remain confidential?",
+      "repeat": 3,
+      "elapsed_ms": 6.781,
+      "abstained": false,
+      "verified_citations": 3
+    },
+    {
+      "file": "employment.txt",
+      "question": "What is my pension contribution rate?",
+      "repeat": 1,
+      "elapsed_ms": 7.04,
+      "abstained": true,
+      "verified_citations": 0
+    },
+    {
+      "file": "employment.txt",
+      "question": "What is my pension contribution rate?",
+      "repeat": 2,
+      "elapsed_ms": 8.925,
+      "abstained": true,
+      "verified_citations": 0
+    },
+    {
+      "file": "employment.txt",
+      "question": "What is my pension contribution rate?",
+      "repeat": 3,
+      "elapsed_ms": 7.433,
+      "abstained": true,
+      "verified_citations": 0
+    }
+  ],
+  "question_latency_ms": {
+    "median": 7.624,
+    "maximum": 12.262,
+    "sample_count": 12
+  },
+  "persisted_index": {
+    "rows_before_questions": 87,
+    "rows_after_questions": 87,
+    "ids_and_payloads_unchanged": true,
+    "method": "Compare row IDs, source/version IDs, and complete payload SHA-256 before and after twelve questions; does not alone prove zero CPU recomputation"
+  },
+  "external_http_attempt_count": 0,
+  "model_call_count": 0,
+  "model_call_method": "All six model/embedding settings explicitly blank; httpx sync/async HTTP transports blocked and counted. This is offline execution, not live-model evidence.",
+  "comparison": {
+    "elapsed_ms": 20.947,
+    "finding_count": 7
+  },
+  "action_plan": {
+    "elapsed_ms": 8.931,
+    "responsibilities": 6,
+    "timeline_entries": 9,
+    "edit_persistence": "passed",
+    "markdown_export": "passed"
+  },
+  "pdf_report": {
+    "generation_elapsed_ms": 169.761,
+    "download_bytes": 10903
+  },
+  "workspace_deletion": "passed; zero remaining chunks or stored files",
+  "interpretation": "One small synthetic local run. These measurements are not throughput, production capacity, model quality, or real-world legal accuracy estimates."
+}

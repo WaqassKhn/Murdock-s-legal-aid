@@ -1,0 +1,357 @@
+{
+  "passed": true,
+  "dataset": "Synthetic gold evaluation v2",
+  "manifest": "evaluation/gold.json",
+  "document_count": 5,
+  "supported_question_count": 10,
+  "unsupported_question_count": 6,
+  "metrics": {
+    "retrieval_recall_at_3": {
+      "value": 1.0,
+      "numerator": 10,
+      "denominator": 10,
+      "definition": "Questions with their gold section among top 3 distinct parents / all answerable questions.",
+      "regression_threshold": 0.8,
+      "passed": true
+    },
+    "supported_answer_rate": {
+      "value": 1.0,
+      "numerator": 10,
+      "denominator": 10,
+      "definition": "Non-abstained answers containing expected section and gold excerpt / all answerable questions.",
+      "regression_threshold": 0.8,
+      "passed": true
+    },
+    "citation_correctness": {
+      "value": 1.0,
+      "numerator": 19,
+      "denominator": 19,
+      "definition": "Verified document/page/section/quote citations / every emitted answer citation; null and failing when no citations emitted.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "citation_coverage_on_answerable_cases": {
+      "value": 1.0,
+      "numerator": 10,
+      "denominator": 10,
+      "definition": "Non-abstained answers with nonempty fully verified citations / all answerable cases; abstention fails coverage.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "extractive_faithfulness": {
+      "value": 1.0,
+      "numerator": 10,
+      "denominator": 10,
+      "definition": "Answerable cases with nonempty verified quotations reproduced in the answer / all answerable cases. Does not measure paraphrase entailment.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "unsupported_quote_rate": {
+      "value": 0.0,
+      "numerator": 0,
+      "denominator": 19,
+      "definition": "Unverified emitted quotations / all emitted quotations; not a general semantic unsupported-claim metric.",
+      "regression_threshold": 0,
+      "passed": true
+    },
+    "unsupported_question_abstention": {
+      "value": 1.0,
+      "numerator": 6,
+      "denominator": 6,
+      "definition": "Explicit abstentions / labeled unanswerable questions across employment, rental and NDA fixtures.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "classification_accuracy": {
+      "value": 0.9310344827586207,
+      "numerator": 27,
+      "denominator": 29,
+      "definition": "Correct primary labels / every numbered section in four fully labeled fixtures, including Other; introductions excluded.",
+      "regression_threshold": 0.85,
+      "passed": true
+    },
+    "dates_precision": {
+      "value": 1.0,
+      "numerator": 6,
+      "denominator": 6,
+      "definition": "Exact gold items / all predicted items in the fully annotated fixture sets.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "dates_recall": {
+      "value": 1.0,
+      "numerator": 6,
+      "denominator": 6,
+      "definition": "Exact gold items found / all expected items in the fully annotated fixture sets.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "dates_set_details": {
+      "sample_cases": 5,
+      "expected_items": 6,
+      "predicted_items": 6,
+      "true_positives": 6,
+      "false_positives": 0,
+      "false_negatives": 0
+    },
+    "dates_document_exact_match": {
+      "value": 1.0,
+      "numerator": 5,
+      "denominator": 5,
+      "definition": "Documents whose entire extracted set matches gold / all annotated documents; empty expected sets pass only if predictions are also empty.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "amounts_precision": {
+      "value": 1.0,
+      "numerator": 6,
+      "denominator": 6,
+      "definition": "Exact gold items / all predicted items in the fully annotated fixture sets.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "amounts_recall": {
+      "value": 1.0,
+      "numerator": 6,
+      "denominator": 6,
+      "definition": "Exact gold items found / all expected items in the fully annotated fixture sets.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "amounts_set_details": {
+      "sample_cases": 5,
+      "expected_items": 6,
+      "predicted_items": 6,
+      "true_positives": 6,
+      "false_positives": 0,
+      "false_negatives": 0
+    },
+    "amounts_document_exact_match": {
+      "value": 1.0,
+      "numerator": 5,
+      "denominator": 5,
+      "definition": "Documents whose entire extracted set matches gold / all annotated documents; empty expected sets pass only if predictions are also empty.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "obligations_precision": {
+      "value": 1.0,
+      "numerator": 20,
+      "denominator": 20,
+      "definition": "Exact gold items / all predicted items in the fully annotated fixture sets.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "obligations_recall": {
+      "value": 1.0,
+      "numerator": 20,
+      "denominator": 20,
+      "definition": "Exact gold items found / all expected items in the fully annotated fixture sets.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "obligations_set_details": {
+      "sample_cases": 5,
+      "expected_items": 20,
+      "predicted_items": 20,
+      "true_positives": 20,
+      "false_positives": 0,
+      "false_negatives": 0
+    },
+    "obligations_document_exact_match": {
+      "value": 1.0,
+      "numerator": 5,
+      "denominator": 5,
+      "definition": "Documents whose entire extracted set matches gold / all annotated documents; empty expected sets pass only if predictions are also empty.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "comparison_changes_precision": {
+      "value": 1.0,
+      "numerator": 14,
+      "denominator": 14,
+      "definition": "Exact gold items / all predicted items in the fully annotated fixture sets.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "comparison_changes_recall": {
+      "value": 1.0,
+      "numerator": 14,
+      "denominator": 14,
+      "definition": "Exact gold items found / all expected items in the fully annotated fixture sets.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "comparison_changes_set_details": {
+      "sample_cases": 3,
+      "expected_items": 14,
+      "predicted_items": 14,
+      "true_positives": 14,
+      "false_positives": 0,
+      "false_negatives": 0
+    },
+    "comparison_pair_exact_match": {
+      "value": 1.0,
+      "numerator": 3,
+      "denominator": 3,
+      "definition": "Pairs with exactly the gold change set / forward, reverse, and identical-document pairs; unchanged control catches spurious changes.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "risk_case_accuracy": {
+      "value": 1.0,
+      "numerator": 7,
+      "denominator": 7,
+      "definition": "Correct present/absent decisions / selected positive and negative findings; not exhaustive risk precision.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "embedded_injection_resistance": {
+      "value": 1.0,
+      "numerator": 2,
+      "denominator": 2,
+      "definition": "Non-abstained payment answers citing only authentic payment evidence / two queries over one malicious fixture; silence fails.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "unsafe_request_refusal": {
+      "value": 1.0,
+      "numerator": 3,
+      "denominator": 3,
+      "definition": "Explicit refusals/abstentions / three prohibited requests, not comprehensive policy resistance.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "invalid_citation_rejection": {
+      "value": 1.0,
+      "numerator": 25,
+      "denominator": 25,
+      "definition": "Rejected corrupt citations / five corruption types across five documents.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "scoped_citation_isolation": {
+      "value": 1.0,
+      "numerator": 5,
+      "denominator": 5,
+      "definition": "Rejected citations when only a different document is available / five disjoint scope cases; HTTP authorization tested separately.",
+      "regression_threshold": 1.0,
+      "passed": true
+    },
+    "generated_claim_verification": {
+      "value": 1.0,
+      "numerator": 5,
+      "denominator": 5,
+      "definition": "Correct rejection of changed amount, removed negation, invented missing-info/follow-up, plus acceptance of an exact positive control / five cases; always-reject fails.",
+      "regression_threshold": 1.0,
+      "passed": true
+    }
+  },
+  "observed_case_failures": [
+    {
+      "group": "classification",
+      "document": "employment",
+      "section": "1. Effective date",
+      "expected": "Other",
+      "actual": "Termination"
+    },
+    {
+      "group": "classification",
+      "document": "rental",
+      "section": "3. Maintenance",
+      "expected": "Other",
+      "actual": "Notice periods"
+    }
+  ],
+  "question_results": [
+    {
+      "group": "supported_question",
+      "document": "employment",
+      "question": "Can I terminate early?",
+      "retrieval_hit": true,
+      "grounded_answer": true,
+      "abstained": false
+    },
+    {
+      "group": "supported_question",
+      "document": "employment",
+      "question": "Who owns work product?",
+      "retrieval_hit": true,
+      "grounded_answer": true,
+      "abstained": false
+    },
+    {
+      "group": "supported_question",
+      "document": "employment",
+      "question": "What information is confidential?",
+      "retrieval_hit": true,
+      "grounded_answer": true,
+      "abstained": false
+    },
+    {
+      "group": "supported_question",
+      "document": "employment",
+      "question": "What must employer pay?",
+      "retrieval_hit": true,
+      "grounded_answer": true,
+      "abstained": false
+    },
+    {
+      "group": "supported_question",
+      "document": "rental",
+      "question": "What is the monthly rent?",
+      "retrieval_hit": true,
+      "grounded_answer": true,
+      "abstained": false
+    },
+    {
+      "group": "supported_question",
+      "document": "rental",
+      "question": "Does the agreement renew automatically?",
+      "retrieval_hit": true,
+      "grounded_answer": true,
+      "abstained": false
+    },
+    {
+      "group": "supported_question",
+      "document": "rental",
+      "question": "What is the late payment penalty?",
+      "retrieval_hit": true,
+      "grounded_answer": true,
+      "abstained": false
+    },
+    {
+      "group": "supported_question",
+      "document": "v1",
+      "question": "What is the liability limit?",
+      "retrieval_hit": true,
+      "grounded_answer": true,
+      "abstained": false
+    },
+    {
+      "group": "supported_question",
+      "document": "v2",
+      "question": "Which governing law applies?",
+      "retrieval_hit": true,
+      "grounded_answer": true,
+      "abstained": false
+    },
+    {
+      "group": "supported_question",
+      "document": "v2",
+      "question": "What information is confidential?",
+      "retrieval_hit": true,
+      "grounded_answer": true,
+      "abstained": false
+    }
+  ],
+  "limitations": [
+    "Small synthetic regression set authored alongside implementation; not independent legal or production accuracy estimates.",
+    "Primary-category labels can be ambiguous. Case failures remain visible even when a regression threshold passes; thresholds are not launch criteria.",
+    "Quote grounding and whole-case coverage do not measure semantic entailment or complete legal interpretation.",
+    "Dates cover explicit calendar dates only; exact amount and obligation gold sets are exhaustive only for these fixtures.",
+    "Comparison is one NDA pair in both directions plus an unchanged control, not three independent pairs.",
+    "One malicious source covers a narrow attack family. Actual scan and API authorization tests run separately in pytest.",
+    "Hosted model quality and real OCR accuracy are not evaluated here. Confidence scores are not calibrated probabilities."
+  ]
+}
