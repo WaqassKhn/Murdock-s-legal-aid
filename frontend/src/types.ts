@@ -12,7 +12,7 @@ export interface Workspace {
   is_demo: boolean;
 }
 export type Status =
-  'uploaded' | 'extracting' | 'indexing' | 'ready' | 'partially_processed' | 'failed';
+  'uploaded' | 'extracting' | 'indexing' | 'analyzing' | 'ready' | 'partially_processed' | 'failed';
 export interface DocumentRecord {
   id: string;
   workspace_id: string;
@@ -129,7 +129,9 @@ export interface Risk {
 export interface Analysis {
   metadata: Record<string, EvidenceField>;
   summary: string;
+  summary_citations?: Citation[];
   meaning: string;
+  meaning_citations?: Citation[];
   clauses: Clause[];
   obligations: Obligation[];
   risks: Risk[];

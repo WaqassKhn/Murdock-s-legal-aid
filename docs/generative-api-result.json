@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "workflow": "synthetic live API generation",
+  "checks": {
+    "generated_documents": 4,
+    "total_documents": 4,
+    "all_documents_generated": true,
+    "generated_answer": true,
+    "paraphrased_answer": true,
+    "unsupported_abstention": true,
+    "clause_lawyer_questions": true,
+    "pdf_export": true,
+    "generated_comparison": true
+  },
+  "elapsed_seconds": 35.16,
+  "limitations": [
+    "Synthetic smoke test, not a legal-accuracy assessment.",
+    "Created workspace data is deleted; the random test account remains."
+  ]
+}

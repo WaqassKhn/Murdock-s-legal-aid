@@ -48,14 +48,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings, app.state.sessions, app.state.engine = settings, sessions, engine
     app.state.processor = processor
     app.state.workspace_locks = WorkspaceLocks()
-    from .providers import OpenAICompatibleProvider
+    from .providers import configured_provider
 
     model_values = (settings.model_base_url, settings.model_api_key, settings.model_name)
     if any(model_values) and not all(model_values):
         raise ValueError(
             'Configure all three LEGALLENS_MODEL_* values, or leave all empty for local extractive mode.'
         )
-    app.state.answer_provider = OpenAICompatibleProvider(*model_values) if all(model_values) else None
+    app.state.answer_provider = configured_provider(settings)
     app.state.limiter = RateLimiter()
     app.state.dummy_password = hash_password('unused-timing-equalization-password')
     app.add_middleware(BodyLimitMiddleware, max_bytes=(settings.max_upload_mb + 1) * 1024 * 1024)

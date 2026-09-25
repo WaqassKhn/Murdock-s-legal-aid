@@ -40,3 +40,13 @@ Next / upcoming task: publish main and verify a fresh unauthenticated clone.
 - [x] Fresh-clone size/history/secret checks recorded in PUBLICATION.md.
 
 GitHub Actions final container check was pending at handoff preparation; use the linked live status. No competition form was submitted. Next / upcoming task: none — authorized publication sequence complete.
+
+## GenAI-first completion
+
+- [x] Replace evidence-selection-only runtime with substantive structured generation for document explanations, Q&A, comparison and lawyer questions.
+- [x] Enable generation for synthetic demo workspaces when credentials are configured; update privacy and actual-mode labels.
+- [x] Preserve exact canonical citations, deterministic facts and numeric checks; add fallible model support review with explicit partial/failure states.
+- [x] Expose reanalysis for existing documents and invalidate local/model/prompt cache signatures.
+- [x] Independent review passed; addressed version-direction review context and provider-label findings.
+- [ ] Finish live API, final regression/build checks and publish the updated submission source.
+Next / upcoming task: complete final live workflow and release verification.

@@ -4,7 +4,7 @@ LegalLens helps someone understand a document, inspect its evidence, compare ter
 
 ## Three-minute demonstration
 
-Before presenting, start the app using the [README](../README.md). Use local extractive mode: leave all `LEGALLENS_MODEL_*` and `LEGALLENS_EMBEDDING_*` settings empty. Create an account and load the clearly labeled synthetic examples. The examples are processed by the real ingestion pipeline; they are not cached model answers. No external provider is needed for this path.
+Before presenting, start the app using the [README](../README.md). Configure the three `LEGALLENS_MODEL_*` settings for Gemini as shown in README; embeddings are optional. Create an account and load the clearly labeled synthetic examples. The examples are processed by the real ingestion pipeline; they are not cached model answers. Wait for the AI-generated analysis labels before presenting. Gemini powers explanations, answers, comparison and lawyer questions. Local extraction is only the explicitly labeled fallback.
 
 | Time | Presenter action | What to explain |
 | --- | --- | --- |

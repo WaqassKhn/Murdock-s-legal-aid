@@ -431,11 +431,12 @@ export default function App() {
             </p>
             <h3>Model processing</h3>
             <p>
-              With a configured AI provider, relevant source excerpts and your question can be sent
-              to that provider. If external embeddings are configured, document chunks are sent
-              during indexing and questions are sent during retrieval. Provider retention depends on
-              your deployment and account settings. The local extraction mode does not send document
-              text to a model provider.
+              When AI is enabled, source text and your questions are sent to the configured provider
+              (such as Gemini) for explanations, answers, and comparison. This also applies to
+              synthetic demo documents. If external embeddings are configured, document chunks are
+              sent during indexing and questions are sent during retrieval. Provider retention
+              depends on your deployment and account settings. The local extraction mode does not
+              send document text to a model provider.
             </p>
             <h3>What LegalLens does</h3>
             <Disclaimer />

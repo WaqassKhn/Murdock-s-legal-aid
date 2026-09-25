@@ -15,10 +15,10 @@ from .database import (
     Entity,
     Obligation,
     RiskFinding,
-    Workspace,
     now,
 )
-from .providers import configured_embedding_provider
+from .providers import configured_embedding_provider, configured_provider
+from .generation import generation_signature
 from .retrieval import build_index, analysis_signature
 
 logger = logging.getLogger('legallens.jobs')
@@ -89,8 +89,6 @@ class Processor:
             job.status = doc.status = 'extracting'
             db.commit()
             doc_id, name, mime, key = doc.id, doc.name, doc.media_type, doc.storage_key
-            workspace = db.get(Workspace, doc.workspace_id)
-            is_demo = workspace.is_demo
         data = (self.settings.storage_dir / key).read_bytes()
         pages = extract_document(data, name, mime)
         if len(pages) > self.settings.max_pages:
@@ -102,6 +100,20 @@ class Processor:
             job.status = doc.status = 'indexing'
             db.commit()
         analysis = analyze_document(doc_id, pages)
+        generation_warning = None
+        generator = configured_provider(self.settings)
+        if generator:
+            with self.sessions() as db:
+                current_job, current_doc = db.get(AnalysisRun, job_id), db.get(Document, doc_id)
+                if not current_job or not current_doc:
+                    return
+                current_job.status = current_doc.status = 'analyzing'
+                db.commit()
+            try:
+                analysis = generator.analyze(analysis)
+            except (RuntimeError, ValueError):
+                generation_warning = 'Gemini analysis was unavailable or failed grounding checks. Showing local extraction; retry analysis for generated explanations.'
+                analysis['mode'] = 'Local extraction fallback · AI analysis unavailable'
         evidence_doc = [{'id': doc_id, 'pages': pages, 'analysis': analysis}]
         citations = []
 
@@ -119,7 +131,7 @@ class Processor:
                     gather(child)
 
         gather(analysis)
-        provider = None if is_demo else configured_embedding_provider(self.settings)
+        provider = configured_embedding_provider(self.settings)
         index_warning = None
         try:
             chunks = build_index({'id': doc_id, 'name': name, 'analysis': analysis}, provider)
@@ -146,6 +158,11 @@ class Processor:
                 db.execute(delete(table).where(table.document_id == doc_id))
             for chunk in chunks:
                 chunk['analysis_signature'] = analysis_signature(provider)
+                chunk['generation_signature'] = (
+                    generation_signature(self.settings)
+                    if not generation_warning and not analysis.get('generation_warnings')
+                    else 'retry-required'
+                )
                 chunk['content_sha256'] = version.sha256
                 db.add(DocumentChunk(document_id=doc_id, version_id=version.id, payload=chunk))
             for page in pages:
@@ -199,8 +216,11 @@ class Processor:
             for citation in unique.values():
                 db.add(Citation(document_id=doc_id, version_id=version.id, payload=citation))
             warnings = [f'Page {p["number"]}: {p["warning"]}' for p in pages if p.get('warning')]
+            warnings.extend(analysis.get('generation_warnings', []))
             if index_warning:
                 warnings.append(index_warning)
+            if generation_warning:
+                warnings.append(generation_warning)
             doc.analysis = analysis
             doc.page_count = len(pages)
             doc.warnings = warnings

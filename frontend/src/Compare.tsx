@@ -111,7 +111,7 @@ export function Compare({
                   {result.findings.length} {result.findings.length === 1 ? 'change' : 'changes'} to
                   review
                 </h2>
-                <span className="mode-badge">{label(result.mode)}</span>
+                <span className="mode-badge">{result.mode}</span>
               </div>
               {result.findings.length === 0 ? (
                 <Empty title="No clause-level changes detected">

@@ -176,6 +176,9 @@ class DocumentAnalysis(Schema):
     metadata: DocumentMetadata
     summary: str
     meaning: str
+    summary_citations: list[Citation] = Field(default_factory=list)
+    meaning_citations: list[Citation] = Field(default_factory=list)
+    generation_warnings: list[str] = Field(default_factory=list)
     clauses: list[ClauseAnalysis]
     obligations: list[Obligation]
     risks: list[RiskFinding]

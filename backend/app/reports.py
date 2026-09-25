@@ -41,6 +41,23 @@ def report_sections(
             lines.append(f'{key.replace("_", " ").title()}: {field["value"]}')
             lines.extend(citation_lines(field['citations']))
         sections.append((f'Document overview — {document["name"]}', lines))
+        sections.append(
+            (
+                'Plain-language system interpretation',
+                [
+                    analysis['summary'],
+                    analysis['meaning'],
+                    *citation_lines(analysis.get('summary_citations', [])),
+                    *citation_lines(analysis.get('meaning_citations', [])),
+                ],
+            )
+        )
+        questions = []
+        for clause in analysis['clauses']:
+            if clause.get('lawyer_question'):
+                questions.append(clause['lawyer_question'])
+                questions.extend(citation_lines(clause['citations']))
+        sections.append(('Questions to prepare for your lawyer', questions))
         review = []
         for risk in analysis['risks']:
             review.extend(

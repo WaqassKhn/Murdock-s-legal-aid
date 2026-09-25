@@ -752,6 +752,20 @@ def _document_answer(question: str, documents: list[dict], provider=None, embedd
     )
     if provider is not None:
         draft = provider.answer(question, citations)
+        from .generation import VerifiedGenerativeAnswer
+
+        if isinstance(draft, VerifiedGenerativeAnswer):
+            selected = {
+                (c['document_id'], c['page'], c['section'], normalized(c['excerpt'])) for c in citations
+            }
+            validated = GroundedAnswer.model_validate(draft).model_dump()
+            if all(
+                verify_citation(c, documents)
+                and (c['document_id'], c['page'], c['section'], normalized(c['excerpt'])) in selected
+                for c in validated['citations']
+            ):
+                return validated
+            raise ValueError('Generated answer cited evidence outside retrieval scope')
         # Fail closed: generated prose is accepted only if it is an exact source span.
         selected_evidence = {
             (c['document_id'], c['page'], c['section'], normalized(c['excerpt'])) for c in citations

@@ -175,6 +175,17 @@ def build_action_plan(db, workspace) -> dict:
                 )
         for clause in analysis.get('clauses', []):
             citations = [c for c in clause.get('citations', []) if c.get('document_id') == doc.id]
+            if clause.get('lawyer_question') and citations:
+                lawyer_questions.append(
+                    {
+                        'id': f'clause-lawyer-{clause["id"]}',
+                        'question': clause['lawyer_question'],
+                        'reason': 'Preparation question based on this clause; independently review the source.',
+                        'document_id': doc.id,
+                        'citations': citations,
+                    }
+                )
+                add_evidence(citations)
             for index, expression in enumerate(clause.get('deadlines', [])):
                 add_event(
                     f'{clause["id"]}-{index}',

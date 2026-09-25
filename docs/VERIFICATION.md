@@ -59,3 +59,15 @@ Checkpoint: implementation → independent change-review completed; proof comple
 Independent closeout review: **Review Gate PASS**, no concrete blockers in provider selection/citation integration, schema isolation, OCR workflow, Docker default and Compose overlay. Reviewer independently ran 46 focused tests with one host OCR skip; container and external calls were verified by the primary engineer. Python lint/format, frontend lint/format and all 10 component tests passed again. Eight evaluation/tooling tests and synthetic evaluation gates passed again.
 
 Targeted private-content check examined 111 unique staged/reachable blobs: zero matches for configured private API keys/passwords and no forbidden tracked runtime paths. This exact-value/path check supplements the earlier pattern scan; it is not a comprehensive secret-detection or privacy certification. Public remote/fresh-clone inspection remains pending.
+
+## GenAI-first verification — 2026-09-25
+
+The current runtime replaces the earlier evidence-selection-only path with generated summaries, clause explanations/review notes/lawyer questions, paraphrased Q&A and comparison explanations. Facts and source citations remain deterministic. Drafts undergo reference/numeric checks and a separate fallible model support review. Demo workspaces use the configured provider. Partial analysis omits rejected generated fields, explicitly labels mixed output and permits retry; unsupported required answers fail visibly.
+
+Executed final live API workflow using the configured Gemini provider: **PASS**, four of four synthetic documents generated, paraphrased cited answer, unsupported abstention, generated comparison, clause lawyer questions and PDF export; **35.16 seconds** total on the local FastAPI/SQLite server. The script deletes its synthetic workspaces. See `generative-api-result.json`. This is a small synthetic smoke test, not a legal accuracy estimate.
+
+Final host backend suite: **75 passed, two OCR skips** (Windows Tesseract absent). Eight evaluation/tooling tests and deterministic evaluation gates passed. Frontend: 11 component tests, lint/format and production build passed. Both Playwright workflows passed against the production frontend with live Gemini enabled (54.2 and 20.2 seconds).
+
+Earlier in this change, the container/PostgreSQL suite passed 75 tests including both real OCR tests; later claim-filter/UI changes require the final CI container rerun. Docker Desktop's engine became unavailable on this host, so the current live app runs directly with Uvicorn on port 8010. Do not claim the final local container rerun occurred while that engine is unavailable.
+
+Independent reviewer rechecked partial rejection, mixed-mode/cache handling, version-direction context and source guards; **Review Gate PASS**, seven focused tests independently passed. The reviewer made no external calls. Hosted semantic checking remains fallible; no production legal correctness guarantee is made.

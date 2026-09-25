@@ -119,8 +119,8 @@ export function Documents({
       </div>
       <p className="field-hint">
         Uploads are stored on this deployment until deleted. Configured external AI providers may
-        receive document chunks and questions for indexing or answers. Check Privacy & retention
-        before uploading sensitive material.
+        receive source text and questions for analysis, comparison, indexing, and answers. Check
+        Privacy & retention before uploading sensitive material.
       </p>
       {documents.length === 0 ? (
         <Empty title="Your evidence starts with a document">

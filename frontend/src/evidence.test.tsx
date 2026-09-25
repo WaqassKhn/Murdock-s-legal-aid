@@ -7,6 +7,25 @@ import { AnswerCard } from './Ask';
 import type { Answer } from './types';
 
 describe('evidence rendering', () => {
+  it('identifies generated answers as interpretation and shows the actual provider mode', () => {
+    const answer: Answer = {
+      direct_answer: 'You need to give advance written notice to end the agreement.',
+      explanation: 'The notice clause describes a written notice requirement.',
+      citations: [],
+      excerpts: [],
+      missing_information: [],
+      confidence: 0.8,
+      follow_up_questions: [],
+      category: 'System interpretation',
+      abstained: false,
+      mode: 'AI-generated answer · evidence checked',
+      answer_type: 'interpreted',
+    };
+    render(<AnswerCard answer={answer} onCitation={vi.fn()} onFollowUp={vi.fn()} />);
+    expect(screen.getByText(answer.mode)).toBeInTheDocument();
+    expect(screen.getAllByText('System interpretation').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Explicit document statement')).not.toBeInTheDocument();
+  });
   it('makes answer provenance and a verification step visible alongside source excerpts', () => {
     const answer = {
       direct_answer: 'The Customer must give 30 days written notice.',

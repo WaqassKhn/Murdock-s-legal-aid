@@ -181,7 +181,8 @@ class OpenAICompatibleProvider:
 
 def configured_provider(settings=None) -> AnswerProvider | None:
     from .config import Settings
+    from .generation import GenerativeProvider
 
     settings = settings or Settings()
     url, key, model = settings.model_base_url, settings.model_api_key, settings.model_name
-    return OpenAICompatibleProvider(url, key, model) if all((url, key, model)) else None
+    return GenerativeProvider(url, key, model) if all((url, key, model)) and not settings.testing else None

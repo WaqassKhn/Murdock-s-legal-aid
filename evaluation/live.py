@@ -49,10 +49,13 @@ def run(provider, count: int = 3) -> dict:
             verified = (
                 bool(answer['citations'])
                 and not answer['abstained']
-                and expected in answer['direct_answer']
+                and expected in ' '.join(c['excerpt'] for c in answer['citations'])
                 and all(verify_citation(citation, [source]) for citation in answer['citations'])
             )
-            model_accepted = answer['mode'] == 'Verified extractive model output'
+            model_accepted = answer['mode'] in (
+                'Verified extractive model output',
+                'AI-generated answer · evidence checked',
+            )
             results.append(
                 dict(
                     case=path,
@@ -132,7 +135,7 @@ def main(argv=None) -> int:
         type=int,
         choices=(1, 2, 3),
         default=3,
-        help='Number of fixed synthetic cases (default 3; at most two HTTP attempts per case).',
+        help='Number of fixed synthetic cases (default 3; up to four HTTP attempts per case including support review).',
     )
     parser.add_argument(
         '--output', type=Path, help='Optional JSON report path. No file is written unless specified.'

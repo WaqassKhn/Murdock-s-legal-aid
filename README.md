@@ -4,7 +4,7 @@ An evidence-first legal document review application with private workspaces, sou
 
 > LegalLens provides document-based legal information, not legal advice. Laws and outcomes depend on jurisdiction and circumstances. Consult a qualified legal professional before making important decisions. AI-generated results may be incomplete or incorrect.
 
-**Status:** runnable single-process MVP with conservative extractive analysis. This is not a validated production legal service. The limits below are part of the product contract, not hidden fallback behavior.
+**Status:** runnable single-process GenAI MVP. A configured Gemini-compatible model generates cited document summaries, clause explanations, review notes, answers, comparison explanations and lawyer questions. This is not a validated production legal service. The limits below are part of the product contract, not hidden fallback behavior.
 
 Legal documents often hide practical responsibilities in long clauses. LegalLens turns those clauses into a cited review, questions, comparisons and a personal preparation checklist. Every uploaded document remains the source of truth; user notes and system interpretations are labeled separately.
 
@@ -33,7 +33,7 @@ cd backend
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --workers 1 --no-access-log
 ```
 
-Open [LegalLens](http://127.0.0.1:5173). Create an account using a password of at least 12 characters. No API key is required. Vite proxies `/api` to the backend; cookies remain same-origin. The first startup applies versioned Alembic migrations automatically. The root `.env` is loaded regardless of the backend working directory; relative data paths resolve from that working directory.
+Open [LegalLens](http://127.0.0.1:5173). Create an account using a password of at least 12 characters. Configure the three model settings below to enable GenAI. Without credentials, the explicitly labeled local extraction mode remains available. Vite proxies `/api` to the backend; cookies remain same-origin. The first startup applies versioned Alembic migrations automatically. The root `.env` is loaded regardless of the backend working directory; relative data paths resolve from that working directory.
 
 To serve a production frontend build from FastAPI locally:
 
@@ -123,17 +123,17 @@ The [measured benchmark](docs/benchmark.json) records machine conditions, per-do
 
 Read the [three-minute demo and manual checklist](docs/HACKATHON.md). Run `python scripts/submission_size.py` after staging the intended source tree, and again in a fresh public clone. The checker measures staged blob bytes, largest files, physical Git objects, all reachable history objects, and a conservative tree-plus-Git budget below 8,000,000 bytes. It cannot certify public access or absence of secrets. Runtime files, uploads, indexes, environments, builds and local screenshots are ignored.
 
-The required final URL must be `https://github.com/<owner>/<repository>`. Creation, public visibility, push and entry submission require your explicit authorization. No repository URL, unauthenticated access check, or fresh remote clone is claimed here. The setup was exercised with a fresh Python environment; that is distinct from an authenticated or unauthenticated clone check.
+The required final URL must be `https://github.com/<owner>/<repository>`. Creation, public visibility, push and entry submission require your explicit authorization. The public repository and unauthenticated fresh clone were verified; see docs/PUBLICATION.md. A competition form has not been submitted automatically.
 
 ## Model configuration
 
 Default mode uses deterministic clause extraction and BM25 plus local concept features. It does not call an external provider.
 
-Optional OpenAI-compatible generation requires all three `LEGALLENS_MODEL_BASE_URL`, `LEGALLENS_MODEL_API_KEY`, and `LEGALLENS_MODEL_NAME`. Base URLs must use HTTPS and include the provider's API prefix. The adapter requests validated structured output, has bounded retries, permits no tools, and treats source text as untrusted. Every generated narrative field must be a canonical source span; unsupported drafts fall back to extractive evidence. This intentionally does **not** claim general semantic entailment verification.
+Optional OpenAI-compatible generation requires all three `LEGALLENS_MODEL_BASE_URL`, `LEGALLENS_MODEL_API_KEY`, and `LEGALLENS_MODEL_NAME`. Base URLs must use HTTPS and include the provider's API prefix. The adapter requests validated structured output, has bounded retries, permits no tools, and treats source text as untrusted. Generated narrative fields are plain-language paraphrases linked to canonical source spans. Numeric/reference guards and a separate model support review reject unsupported interpretations. This review is fallible, not a guarantee of semantic or legal correctness. Partial document failures retain explicitly labeled local fields; Q&A/comparison failures return actionable errors.
 
 Optional learned dense retrieval uses `LEGALLENS_EMBEDDING_MODEL`, `LEGALLENS_EMBEDDING_BASE_URL`, and `LEGALLENS_EMBEDDING_API_KEY`; URL/key can inherit generation settings. Clause children, offsets, tokens and vectors are persisted with the exact document version. Ingestion embeds source text once in bounded batches; later questions embed only the query. BM25 and dense ranks are fused using reciprocal rank fusion (k=60), reranked by query concept coverage, then returned with their cited parent clauses. A changed embedding configuration uses local vectors until reanalysis refreshes the index. Hosted indexing failures leave usable local analysis with a visible warning. Unchanged ready analyses reuse a signature of source hash, analysis/index version and embedding configuration. Deletion cascades to the index.
 
-Enabling hosted embeddings sends source chunks during ingestion; enabling generation sends selected evidence and the question. Review the provider's retention policy first. Synthetic demo workspaces always use local processing, even when provider credentials are configured; these are freshly computed results, not cached generated answers.
+Enabling hosted embeddings sends source chunks during ingestion; enabling generation sends selected evidence and the question. Review the provider's retention policy first. Synthetic demo workspaces use the configured model just like uploaded documents. Demo results are generated from the supplied synthetic sources; external API calls may incur charges.
 
 ## Architecture and APIs
 
@@ -160,7 +160,7 @@ The API schema is available at `/docs`; health is `/health`. Core operations liv
 - **Retrieval:** local concept projection is not learned dense retrieval. Hosted embeddings require credentials. Vectors persist in SQLite/PostgreSQL JSON rows and are ranked in-process; there is no approximate-nearest-neighbor service or cross-encoder. Large-corpus quality and latency are unverified. Existing documents from an earlier schema acquire indexes when reanalyzed.
 - **Operations:** exactly one API process/worker. Processing jobs survive restarts, but distributed claims/locks/rate limits are not implemented. No email verification, password reset, SSO, or account deletion UI. Use private deployment with trusted users until these controls and an external security review are complete.
 - **Retention:** active data remains until deletion. Deleting a document also removes workspace reports and conversation snapshots; backups and provider copies follow operator policies. No forensic erasure guarantee. Encrypt production disks and backups.
-- **Verification:** Container/PostgreSQL workflows and synthetic real OCR pass. Three live Gemini evidence-selection probes pass; this does not establish broader hosted-provider quality, accessibility conformance or load capacity. Review [verification notes](docs/VERIFICATION.md) before deployment.
+- **Verification:** Container/PostgreSQL workflows and synthetic real OCR pass. The live generative API workflow passes for four synthetic documents, cited Q&A, comparison and report export; this does not establish broader hosted-provider quality, accessibility conformance or load capacity. Review [verification notes](docs/VERIFICATION.md) before deployment.
 
 ## Reproduce the container verification
 
@@ -179,6 +179,29 @@ For browser tests, set `E2E_BASE_URL=http://127.0.0.1:8010` and run `npm run tes
 
 ### Live provider check
 
-The optional provider now returns validated evidence IDs; the server copies complete canonical clauses, page/section references and extraction confidence. Existing grounding checks still reject invalid source relationships. This prevents shortened quotations from dropping conditions and prevents model-created confidence inflation. It remains conservative extractive assistance, not unrestricted generated legal advice.
+The provider generates plain-language claims referencing server-owned evidence IDs. The server resolves exact citations, checks numeric values and runs a separate model-based support review. Unsupported generated fields are omitted; remaining local extraction is explicitly labeled. These automated checks reduce risk but cannot guarantee semantic or legal correctness.
 
-Configure all three `LEGALLENS_MODEL_BASE_URL`, `LEGALLENS_MODEL_API_KEY`, and `LEGALLENS_MODEL_NAME` values before running `python evaluation/live.py --confirm-external-processing`. `GEMINI_API_KEY` alone does not enable the application provider. Google's [OpenAI-compatible API](https://ai.google.dev/gemini-api/docs/openai) was tested with `gemini-3.5-flash-lite` on 2026-09-24; model availability is account-dependent. Only synthetic repository fixtures were sent. Three of three live results passed exact evidence verification, with no fallback; see [the recorded result](docs/live-provider-result.json). This tiny probe is not a legal-accuracy benchmark.
+Configure all three `LEGALLENS_MODEL_BASE_URL`, `LEGALLENS_MODEL_API_KEY`, and `LEGALLENS_MODEL_NAME` values before running `python evaluation/live.py --confirm-external-processing`. `GEMINI_API_KEY` alone does not enable the application provider. Google's [OpenAI-compatible API](https://ai.google.dev/gemini-api/docs/openai) was tested with `gemini-3.5-flash-lite` on 2026-09-24; model availability is account-dependent. Only synthetic repository fixtures were sent. The earlier evidence-selection probe is retained as historical evidence in docs/live-provider-result.json. The current generative workflow is tested separately with the command below; neither is a legal-accuracy benchmark.
+
+## Enable the actual GenAI experience
+
+Set these values in the root `.env` before startup (keep the key private):
+
+```dotenv
+LEGALLENS_MODEL_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai
+LEGALLENS_MODEL_API_KEY=your-gemini-api-key
+LEGALLENS_MODEL_NAME=gemini-3.5-flash-lite
+```
+
+The model name is configurable and account availability may change. `GEMINI_API_KEY` alone is not read by the application. Then run `docker compose up --build -d` after setting `POSTGRES_PASSWORD`. Open http://localhost:8000, register, and load the synthetic demo. Analysis shows **AI-generated analysis (model name)**. Ask produces a generated answer with exact source evidence; Compare generates practical explanations of changes; Action Center and PDF/DOCX reports include generated lawyer questions.
+
+For existing locally analyzed documents, open Analysis and select **Reanalyze document**. The model/prompt signature invalidates the old local cache. If some generated claims fail checks, the UI reports mixed local/generated output and those fields can be retried. Complete provider failure retains clearly labeled local extraction. Q&A or comparison failure returns an actionable error rather than pretending the model succeeded.
+
+```sh
+# Against a running server with generation configured; makes real external calls:
+python evaluation/live_workflow.py --base-url http://localhost:8000 --confirm-external-processing --output live-workflow-result.json
+```
+
+This command creates four synthetic demo documents, checks generated summaries, paraphrased cited answers, abstention, comparison, lawyer questions and PDF export, then deletes its workspaces. A random test account remains. Never commit runtime result files containing private data. The ordinary automated suite uses mocked providers and does not require paid calls.
+
+Generation is bounded to 48 readable clauses / 40,000 source characters for document interpretation and 40 changed clauses for comparison. Longer documents retain local extraction with a visible warning; they are not silently presented as fully AI-reviewed. Dates, amounts, original obligations, canonical source citations and severity labels remain deterministically extracted. Two model stages (draft and support review) increase latency and cost; the review model is fallible and is not a substitute for professional review.

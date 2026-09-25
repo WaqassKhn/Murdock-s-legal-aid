@@ -298,7 +298,9 @@ export function WorkspaceHome({
           </p>
           <p className="muted">
             These fictional documents are for demonstrating the product. They are not templates or
-            legal advice.
+            legal advice. When AI is configured, these samples also use the configured provider for
+            explanations and answers. Each result identifies whether AI or a local fallback was
+            used.
           </p>
           {error && <ErrorNotice message={error} />}
           <button className="primary full" onClick={demo} disabled={busy}>

@@ -386,8 +386,10 @@ def analyze(w: str, d: str, request: Request, current=Depends(user), db=Depends(
     from .providers import configured_embedding_provider
     from .retrieval import analysis_signature
 
-    workspace = owned_workspace(db, current.id, w)
-    provider = None if workspace.is_demo else configured_embedding_provider(request.app.state.settings)
+    owned_workspace(db, current.id, w)
+    provider = configured_embedding_provider(request.app.state.settings)
+    from .generation import generation_signature
+
     chunk = db.scalar(select(DocumentChunk).where(DocumentChunk.document_id == d))
     version = db.scalar(select(DocumentVersion).where(DocumentVersion.document_id == d))
     if (
@@ -395,6 +397,8 @@ def analyze(w: str, d: str, request: Request, current=Depends(user), db=Depends(
         and chunk
         and version
         and chunk.payload.get('analysis_signature') == analysis_signature(provider)
+        and chunk.payload.get('generation_signature', 'local')
+        == generation_signature(request.app.state.settings)
         and chunk.payload.get('content_sha256') == version.sha256
     ):
         previous = db.scalar(
@@ -456,7 +460,7 @@ def checklist(w: str, current=Depends(user), db=Depends(session)):
 def ask(w: str, payload: QuestionInput, request: Request, current=Depends(user), db=Depends(session)):
     from .intelligence import answer_question, verify_citation
 
-    workspace = owned_workspace(db, current.id, w)
+    owned_workspace(db, current.id, w)
     expensive(request, current)
     selected = (
         list(db.scalars(select(Document).where(Document.workspace_id == w)))
@@ -481,13 +485,11 @@ def ask(w: str, payload: QuestionInput, request: Request, current=Depends(user),
     try:
         from .providers import configured_embedding_provider
 
-        embedding_provider = (
-            False if workspace.is_demo else configured_embedding_provider(request.app.state.settings) or False
-        )
+        embedding_provider = configured_embedding_provider(request.app.state.settings) or False
         answer = answer_question(
             payload.question,
             docs,
-            provider=None if workspace.is_demo else request.app.state.answer_provider,
+            provider=request.app.state.answer_provider,
             embedding_provider=embedding_provider,
         )
     except (RuntimeError, ValueError):
@@ -526,11 +528,21 @@ def compare(w: str, payload: CompareInput, request: Request, current=Depends(use
     if not left.analysis or not right.analysis:
         raise HTTPException(409, 'Both documents must finish analysis before comparison.')
     findings = compare_documents(document_json(db, left, True), document_json(db, right, True))
+    mode = 'clause-aligned semantic and exact-text comparison'
+    generator = request.app.state.answer_provider
+    if generator and hasattr(generator, 'compare'):
+        try:
+            findings = generator.compare(findings)
+            mode = 'AI-generated comparison · evidence checked'
+        except (RuntimeError, ValueError):
+            raise HTTPException(
+                502, 'AI comparison was unavailable or failed evidence checks. Retry comparison.'
+            ) from None
     comparison = Comparison(
         workspace_id=w,
         left_id=left.id,
         right_id=right.id,
-        payload={'findings': findings, 'mode': 'clause-aligned semantic and exact-text comparison'},
+        payload={'findings': findings, 'mode': mode},
     )
     db.add(comparison)
     db.commit()

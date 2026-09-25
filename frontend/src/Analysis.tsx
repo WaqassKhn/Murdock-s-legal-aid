@@ -121,7 +121,7 @@ export function AnalysisView({
               <div className="notice warning">
                 <ShieldAlert size={18} />
                 <div>
-                  <strong>Extraction needs attention</strong>
+                  <strong>Processing needs attention</strong>
                   <p>{detail.warnings.join(' ')}</p>
                 </div>
               </div>
@@ -152,7 +152,19 @@ export function AnalysisView({
                   </span>
                   <span>{detail.page_count} pages</span>
                   <span>Version {detail.version}</span>
-                  <span className="mode-badge">{label(detail.analysis.mode)} analysis</span>
+                  <span className="mode-badge">{detail.analysis.mode}</span>
+                  <button
+                    className="secondary"
+                    onClick={reanalyze}
+                    disabled={
+                      busy || !['ready', 'partially_processed', 'failed'].includes(detail.status)
+                    }
+                  >
+                    <RefreshCw size={16} />
+                    {['uploaded', 'extracting', 'indexing', 'analyzing'].includes(detail.status)
+                      ? 'Analysis in progress…'
+                      : 'Reanalyze document'}
+                  </button>
                 </div>
                 <div className="tabs" role="tablist" aria-label="Analysis sections">
                   {(['Overview', 'Clauses', 'Review findings', 'Evidence Map'] as Tab[]).map(
@@ -181,12 +193,24 @@ export function AnalysisView({
                         </div>
                         <h2>The document, in plain language.</h2>
                         <p>{detail.analysis.summary}</p>
+                        {!!detail.analysis.summary_citations?.length && (
+                          <Citations
+                            items={detail.analysis.summary_citations}
+                            onSelect={onCitation}
+                          />
+                        )}
                         <div className="meaning">
                           <strong>What this means for you</strong>
                           <p>{detail.analysis.meaning}</p>
+                          {!!detail.analysis.meaning_citations?.length && (
+                            <Citations
+                              items={detail.analysis.meaning_citations}
+                              onSelect={onCitation}
+                            />
+                          )}
                         </div>
                         <p className="field-hint">
-                          Interpretations summarize the source-linked fields below. Review the exact
+                          Interpretations explain the cited document evidence. Review the exact
                           wording before relying on them.
                         </p>
                       </section>

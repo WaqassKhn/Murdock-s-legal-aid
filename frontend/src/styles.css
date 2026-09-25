@@ -1366,13 +1366,14 @@ select:hover {
 }
 .mode-badge {
   display: inline-flex;
-  font-size: 8px;
+  font-size: 12px;
   white-space: normal;
+  overflow-wrap: anywhere;
   border: 1px solid #e5eadf;
   border-radius: 4px;
   padding: 5px 7px;
   background: #f7f9f2;
-  color: #869674;
+  color: #465638;
 }
 .tabs {
   display: flex;
@@ -3423,7 +3424,7 @@ select:hover {
     font-size: 9px;
   }
   .analysis-meta .mode-badge {
-    font-size: 7px;
+    font-size: 12px;
   }
   .document-row {
     padding: 20px 16px;
@@ -3725,8 +3726,8 @@ select:hover {
     gap: 8px;
   }
   .answer-heading .mode-badge {
-    font-size: 6px;
-    max-width: 95px;
+    font-size: 12px;
+    max-width: 100%;
   }
   .answer-card h3 {
     font-size: 14px;

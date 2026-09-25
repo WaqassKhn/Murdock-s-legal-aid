@@ -46,7 +46,7 @@ export function AnswerCard({
                 : 'Document-grounded response'}
           </span>
         </div>
-        <span className="mode-badge">{label(answer.mode)}</span>
+        <span className="mode-badge">{answer.mode}</span>
       </div>
       <h3>{answer.direct_answer}</h3>
       {answer.answer_type && (
