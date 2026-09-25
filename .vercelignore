@@ -1,4 +1,5 @@
 .env
+pyproject.toml
 .venv/
 .clean-check/
 data/
