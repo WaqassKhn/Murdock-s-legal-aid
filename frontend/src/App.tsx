@@ -189,7 +189,7 @@ export default function App() {
         >
           <X size={22} />
         </button>
-        <div className="sidebar-caption">YOUR REVIEW DESK</div>
+
         <nav aria-label="Main navigation">
           {navigation.map(({ name, icon: Icon }) => (
             <button
@@ -223,16 +223,7 @@ export default function App() {
         <div className="sidebar-bottom">
           <div className="sidebar-promise">
             <ShieldCheck size={20} />
-            <strong>
-              Confidence starts
-              <br />
-              with evidence.
-            </strong>
-            <p>
-              Every insight has a path
-              <br />
-              back to the source.
-            </p>
+
             <button onClick={() => setPrivacy(true)}>
               Privacy & retention
               <ArrowRight size={13} />

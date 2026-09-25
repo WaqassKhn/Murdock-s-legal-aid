@@ -184,9 +184,7 @@ export function Ask({
     <>
       <div className="page-heading">
         <div>
-          <div className="eyebrow">ANSWERS YOU CAN TRACE</div>
           <h1>Ask your documents.</h1>
-          <p>Understand the terms, with the evidence beside every answer.</p>
         </div>
         <span className="grounded-tag">
           <ShieldCheck size={16} />
@@ -254,14 +252,10 @@ export function Ask({
               </button>
             </div>
           </form>
-          <p className="field-hint">
-            Questions and responses may be retained in workspace history. Do not include information
-            you do not want stored.
-          </p>
+          <p className="field-hint">Questions and answers are saved in workspace history.</p>
         </div>
         <aside className="ask-aside">
           <section className="panel">
-            <div className="eyebrow">REVIEW CONTEXT</div>
             <h3>Keep the scope clear.</h3>
             <label>
               Document scope

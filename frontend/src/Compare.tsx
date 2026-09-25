@@ -41,9 +41,7 @@ export function Compare({
     <>
       <div className="page-heading">
         <div>
-          <div className="eyebrow">SEE WHAT CHANGED. UNDERSTAND WHY.</div>
           <h1>The difference is in the details.</h1>
-          <p>Compare clause meaning and exact wording across two documents.</p>
         </div>
         <GitCompareArrows size={33} className="heading-icon" />
       </div>

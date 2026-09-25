@@ -63,11 +63,8 @@ export function Documents({
     <>
       <div className="page-heading">
         <div>
-          <div className="eyebrow">
-            {workspace.is_demo ? 'SYNTHETIC DEMO WORKSPACE' : 'WORKSPACE LIBRARY'}
-          </div>
+          {workspace.is_demo && <div className="eyebrow">SYNTHETIC DEMO</div>}
           <h1>Documents</h1>
-          <p>The source of truth for every insight in {workspace.name}.</p>
         </div>
         <button className="primary" onClick={() => input.current?.click()} disabled={busy}>
           <UploadCloud size={17} />
@@ -106,21 +103,15 @@ export function Documents({
           {busy ? 'Adding your documents…' : 'Drop your documents here, or browse files'}
         </strong>
         <span>PDF, scanned PDF, DOCX, or TXT · Up to 20 MB each</span>
-        <small>
-          Text extraction and analysis begin automatically. Poor-quality pages are flagged for
-          review.
-        </small>
       </button>
       <div className="section-heading">
         <h2>
           Document library <span className="count">{documents.length}</span>
         </h2>
-        <span className="small muted">Original sources are preserved</span>
       </div>
       <p className="field-hint">
-        Uploads are stored on this deployment until deleted. Configured external AI providers may
-        receive source text and questions for analysis, comparison, indexing, and answers. Check
-        Privacy & retention before uploading sensitive material.
+        Uploads stay until deleted. Configured AI providers receive document text. See Privacy &
+        retention.
       </p>
       {documents.length === 0 ? (
         <Empty title="Your evidence starts with a document">
@@ -169,10 +160,7 @@ export function Documents({
       )}
       <div className="info-strip">
         <strong>A note on page accuracy</strong>
-        <span>
-          PDF citations use original page numbers. DOCX and TXT use extracted logical pages because
-          their pagination can vary between editors.
-        </span>
+        <span>PDF: original pages. DOCX and TXT: extracted logical pages.</span>
       </div>
     </>
   );

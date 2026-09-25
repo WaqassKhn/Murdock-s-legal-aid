@@ -96,9 +96,7 @@ export function AnalysisView({
     <>
       <div className="page-heading compact">
         <div>
-          <div className="eyebrow">READ WITH UNDERSTANDING</div>
           <h1>Document analysis</h1>
-          <p>Source facts, plain-language interpretation, and a path back to the page.</p>
         </div>
         <label className="inline-label">
           Document
@@ -209,10 +207,6 @@ export function AnalysisView({
                             />
                           )}
                         </div>
-                        <p className="field-hint">
-                          Interpretations explain the cited document evidence. Review the exact
-                          wording before relying on them.
-                        </p>
                       </section>
                       <section className="panel metadata-panel">
                         <div className="section-heading">
@@ -459,7 +453,6 @@ function EvidenceMap({
     <section className="panel evidence-map">
       <div className="section-heading">
         <div>
-          <div className="eyebrow">THE REASONING, MADE VISIBLE</div>
           <h2>Follow the evidence.</h2>
           <p className="muted">
             Select a clause to trace its findings to the words that support them.

@@ -49,9 +49,7 @@ export function Reports({ workspace }: { workspace: Workspace }) {
     <>
       <div className="page-heading">
         <div>
-          <div className="eyebrow">PREPARE FOR A BETTER CONVERSATION</div>
           <h1>Bring clarity to your consultation.</h1>
-          <p>A structured handoff, grounded in your documents and shaped around your questions.</p>
         </div>
         <FileDown size={34} className="heading-icon" />
       </div>
@@ -100,7 +98,6 @@ export function Reports({ workspace }: { workspace: Workspace }) {
         </section>
         <aside>
           <section className="report-contents">
-            <span className="eyebrow">WHAT GOES IN</span>
             <h3>
               The important things,
               <br />
@@ -129,7 +126,6 @@ export function Reports({ workspace }: { workspace: Workspace }) {
         <h2>
           Generated reports <span className="count">{reports.length}</span>
         </h2>
-        <span className="small muted">Saved in this workspace</span>
       </div>
       {loading ? (
         <Loading text="Loading reports…" />

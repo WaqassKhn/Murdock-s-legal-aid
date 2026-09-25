@@ -116,12 +116,7 @@ export function Obligations({
     <>
       <div className="page-heading">
         <div>
-          <div className="eyebrow">ACTION CENTER · FROM TERMS TO TASKS</div>
           <h1>Your next steps, in focus.</h1>
-          <p>
-            A personal plan built around your obligations, open questions, and exact source
-            evidence.
-          </p>
         </div>
         <div className="action-exports">
           <a className="secondary" href={`/api${workspacePath(workspace.id)}/checklist`} download>
@@ -429,7 +424,6 @@ export function Obligations({
               <section className="panel preparation-evidence">
                 <div className="section-heading">
                   <div>
-                    <div className="eyebrow">BRING THE SOURCE WITH YOU</div>
                     <h2>Evidence to prepare</h2>
                   </div>
                   <BookOpen size={22} />

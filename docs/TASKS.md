@@ -52,3 +52,12 @@ GitHub Actions final container check was pending at handoff preparation; use the
 - [x] Published runtime commit `fe95824`; unauthenticated fresh clone and size verification passed. GitHub Actions run `36139252153` completed successfully, including final container checks.
 
 Checkpoint: Shipping -> none. Proof, independent review, public access and CI verified. Documentation-only handoff records these results. Next / upcoming task: none — authorized publication sequence complete.
+
+
+## Interface copy cleanup — 2026-09-25
+
+- [x] Removed repeated heading taglines, sidebar marketing copy, duplicate notices and workspace filler; shortened upload/privacy and pagination hints. Preserved citations, AI/local labels, legal notice, errors and controls.
+- [x] Frontend lint, 11 component tests, production build and Docker build passed. Inspected the rendered dashboard. Independent read-only review passed.
+- [x] Two live Gemini browser workflows passed with a 90-second assertion allowance. The first run's 15-second assertion expired while the answer was still processing; no application error was shown. Provider latency remains variable. No production timeout or backend behavior changed.
+
+Checkpoint: proof and review passed; publish the eight-file UI cleanup and this ledger under the existing repository authorization. Rollback: revert this commit and rebuild the image; no data changes. Next / upcoming task: none — UI cleanup sequence complete after push.

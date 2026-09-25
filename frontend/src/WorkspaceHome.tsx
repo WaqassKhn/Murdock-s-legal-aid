@@ -69,9 +69,7 @@ export function WorkspaceHome({
     <>
       <div className="page-heading">
         <div>
-          <div className="eyebrow">YOUR DOCUMENT REVIEW DESK</div>
           <h1>A clearer picture starts here.</h1>
-          <p>Bring your documents together. Understand what matters.</p>
         </div>
         <button className="primary" onClick={() => setCreating(true)}>
           <Plus size={17} />
@@ -80,16 +78,12 @@ export function WorkspaceHome({
       </div>
       <section className="welcome-banner">
         <div className="welcome-copy">
-          <span className="eyebrow">THE LEGALLENS APPROACH</span>
           <h2>
             More understanding.
             <br />
             <em>Less uncertainty.</em>
           </h2>
-          <p>
-            Explore the terms, track your obligations, and turn your questions into an informed
-            conversation.
-          </p>
+
           <button className="text-button" onClick={() => setDemoConfirm(true)}>
             Explore synthetic demo documents <ArrowRight size={16} />
           </button>
@@ -130,10 +124,6 @@ export function WorkspaceHome({
               <small>SUPPORTING EVIDENCE</small>
               <strong>The exact source page</strong>
             </div>
-          </div>
-          <div className="illustration-caption">
-            <span className="status-dot" />
-            Traceable by design.
           </div>
         </div>
       </section>
@@ -178,7 +168,6 @@ export function WorkspaceHome({
         <h2>
           Your workspaces <span className="count">{workspaces.length}</span>
         </h2>
-        <span className="muted small">Private to your account</span>
       </div>
       {workspaces.length === 0 ? (
         <Empty
@@ -215,10 +204,7 @@ export function WorkspaceHome({
                   <ArrowUpRight size={18} />
                 </button>
               </h3>
-              <p>
-                {w.objective ||
-                  'A private space to understand your documents and prepare your questions.'}
-              </p>
+              {w.objective && <p>{w.objective}</p>}
               <div className="workspace-card-footer">
                 <span>
                   <FileText size={14} />
@@ -233,20 +219,11 @@ export function WorkspaceHome({
               <Plus size={24} />
             </span>
             <strong>Start something new</strong>
-            <span>One workspace. The complete picture.</span>
           </button>
         </div>
       )}
-      <div className="quiet-note">
-        <ShieldCheck size={18} />
-        <p>
-          <strong>A starting point for better questions.</strong> LegalLens helps you understand
-          document evidence. It does not replace a qualified legal professional.
-        </p>
-      </div>
       {creating && (
         <Modal title="Create a workspace" onClose={() => setCreating(false)}>
-          <p className="muted">Keep related documents together for a more complete review.</p>
           <form onSubmit={create}>
             {error && <ErrorNotice message={error} />}
             <label>
