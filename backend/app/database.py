@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, create_engine, event
+from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 
 
@@ -161,9 +162,12 @@ class GeneratedReport(Identified, Base):
     document_ids: Mapped[list] = mapped_column(JSON)
 
 
-def database(url: str):
+def database(url: str, serverless: bool = False):
     engine = create_engine(
-        url, connect_args={'check_same_thread': False} if url.startswith('sqlite') else {}, pool_pre_ping=True
+        url,
+        connect_args={'check_same_thread': False} if url.startswith('sqlite') else {},
+        pool_pre_ping=True,
+        **({'poolclass': NullPool} if serverless else {}),
     )
     if url.startswith('sqlite'):
 
@@ -173,4 +177,4 @@ def database(url: str):
             connection.execute('PRAGMA busy_timeout=15000')
             connection.execute('PRAGMA journal_mode=WAL')
 
-    return engine, sessionmaker(engine, expire_on_commit=False)
+    return engine, sessionmaker(engine, expire_on_commit=False, info={'serverless': serverless})

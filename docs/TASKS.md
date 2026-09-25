@@ -61,3 +61,17 @@ Checkpoint: Shipping -> none. Proof, independent review, public access and CI ve
 - [x] Two live Gemini browser workflows passed with a 90-second assertion allowance. The first run's 15-second assertion expired while the answer was still processing; no application error was shown. Provider latency remains variable. No production timeout or backend behavior changed.
 
 Checkpoint: proof and review passed; publish the eight-file UI cleanup and this ledger under the existing repository authorization. Rollback: revert this commit and rebuild the image; no data changes. Next / upcoming task: none — UI cleanup sequence complete after push.
+
+## Vercel and Supabase deployment — 2026-09-26
+
+- [x] Package React and FastAPI in one Vercel project with request-owned processing, private Supabase file storage and PostgreSQL persistence.
+- [x] Add cross-instance PostgreSQL workspace locks, shared rate limits, owner-checked storage access, cloud migration and explicit hosting limits.
+- [x] Connect browser processing/resume states and server-reported upload/OCR capabilities.
+- [x] Docker PostgreSQL/OCR backend suite: 102 passed. Frontend: 15 tests, lint and production build passed. Browser serverless-mode workflow: two tests passed (deterministic test provider, not a live Gemini/cloud claim).
+- [x] Independent review by genai_review passed, including follow-up inspection of threadpool changes. Live Supabase calls remain unverified; cloud storage integration uses a mocked transport.
+- [x] Document exact account setup, seven server environment values, limits and recovery in VERCEL.md.
+- [ ] Configure authenticated Vercel/Supabase accounts and verify the live production workflow. Account login and private database/storage credentials are not yet available.
+
+Authorized delivery: commit and push to the existing main branch under the user's explicit publication/deployment request. Scope is the Vercel conversion; no unrelated changes. Rollback: revert this conversion and restore the previous Docker deployment; migration 0004's RLS must remain enabled. Do not roll back RLS on a publicly exposed Supabase database. Hosted deployment and CI status must be checked separately from local proof.
+
+Checkpoint: implementation proof and independent review passed; source publication may proceed, hosted readiness is pending. Next / upcoming task: configure Vercel at repository root, add private settings, deploy and verify health plus a complete live workflow.

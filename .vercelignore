@@ -1,0 +1,11 @@
+.env
+.venv/
+.clean-check/
+data/
+node_modules/
+frontend/node_modules/
+frontend/dist/
+.git/
+**/__pycache__/
+**/test-results/
+**/playwright-report/

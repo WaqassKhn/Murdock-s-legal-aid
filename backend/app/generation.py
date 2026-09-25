@@ -133,7 +133,7 @@ class GenerativeProvider(OpenAICompatibleProvider):
                     self.base_url + '/chat/completions',
                     headers={'Authorization': 'Bearer ' + self.api_key},
                     json=payload,
-                    timeout=60,
+                    timeout=getattr(self, 'request_timeout', 60),
                 )
                 response.raise_for_status()
                 return schema.model_validate_json(response.json()['choices'][0]['message']['content'])

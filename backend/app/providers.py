@@ -185,4 +185,8 @@ def configured_provider(settings=None) -> AnswerProvider | None:
 
     settings = settings or Settings()
     url, key, model = settings.model_base_url, settings.model_api_key, settings.model_name
-    return GenerativeProvider(url, key, model) if all((url, key, model)) and not settings.testing else None
+    if all((url, key, model)) and not settings.testing:
+        provider = GenerativeProvider(url, key, model)
+        provider.request_timeout = 30 if settings.serverless else 60
+        return provider
+    return None

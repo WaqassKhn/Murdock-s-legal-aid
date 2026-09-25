@@ -31,11 +31,15 @@ class Processor:
     def __init__(self, sessions, settings):
         self.sessions = sessions
         self.settings = settings
-        self.pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix='document')
+        self.pool = (
+            None if settings.serverless else ThreadPoolExecutor(max_workers=2, thread_name_prefix='document')
+        )
         self.lock = threading.Lock()
         self.pending: set[str] = set()
 
     def submit(self, job_id: str):
+        if self.pool is None:
+            return  # The authenticated processing request owns execution on serverless hosts.
         with self.lock:
             if job_id in self.pending:
                 return
@@ -43,12 +47,15 @@ class Processor:
         self.pool.submit(self._run, job_id)
 
     def recover(self):
+        if self.settings.serverless:
+            return
         with self.sessions() as db:
             for job in db.scalars(select(AnalysisRun).where(AnalysisRun.status.not_in(TERMINAL))):
                 self.submit(job.id)
 
     def close(self):
-        self.pool.shutdown(wait=True)
+        if self.pool:
+            self.pool.shutdown(wait=True)
 
     def _run(self, job_id: str):
         try:
@@ -89,8 +96,17 @@ class Processor:
             job.status = doc.status = 'extracting'
             db.commit()
             doc_id, name, mime, key = doc.id, doc.name, doc.media_type, doc.storage_key
-        data = (self.settings.storage_dir / key).read_bytes()
-        pages = extract_document(data, name, mime)
+        from .storage import storage
+
+        data = storage(self.settings).read(key)
+        pages = extract_document(
+            data,
+            name,
+            mime,
+            allow_ocr=not self.settings.serverless,
+            max_pages=self.settings.max_pages,
+            max_text=30000 if self.settings.serverless else 2_000_000,
+        )
         if len(pages) > self.settings.max_pages:
             raise ValueError('Page budget exceeded')
         with self.sessions() as db:

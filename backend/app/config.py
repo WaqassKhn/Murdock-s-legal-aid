@@ -23,3 +23,8 @@ class Settings(BaseSettings):
     embedding_base_url: str = ''
     embedding_api_key: str = ''
     embedding_model: str = ''
+
+    serverless: bool = False
+    supabase_url: str = ''
+    supabase_secret_key: str = ''
+    supabase_bucket: str = 'legallens-documents'

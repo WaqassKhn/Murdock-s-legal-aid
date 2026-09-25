@@ -5,7 +5,9 @@ from pathlib import Path
 from typing import Literal
 
 from fastapi import APIRouter, Depends, File, HTTPException, Request, Response, UploadFile
-from fastapi.responses import FileResponse
+from urllib.parse import quote
+from starlette.concurrency import run_in_threadpool
+from .storage import storage
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import delete, func, select
 from sqlalchemy.exc import IntegrityError
@@ -177,6 +179,9 @@ def document_json(db, doc, full=False):
         )
     }
     result['job_id'] = job.id if job else None
+    result['processing_required'] = bool(
+        db.info.get('serverless') and job and job.status not in {'ready', 'partially_processed', 'failed'}
+    )
     if full:
         result['pages'] = [
             page.payload
@@ -211,7 +216,7 @@ def obligations_json(db, workspace_id):
 def add_document(db, settings, workspace_id: str, name: str, data: bytes, mime: str):
     identifier = uid()
     key = identifier + Path(name).suffix.lower()
-    (settings.storage_dir / key).write_bytes(data)
+    storage(settings).write(key, data)
     try:
         doc = Document(id=identifier, workspace_id=workspace_id, name=name, media_type=mime, storage_key=key)
         db.add(doc)
@@ -223,7 +228,7 @@ def add_document(db, settings, workspace_id: str, name: str, data: bytes, mime: 
         return doc, job
     except Exception:
         db.rollback()
-        (settings.storage_dir / key).unlink(missing_ok=True)
+        storage(settings).delete(key)
         raise
 
 
@@ -292,10 +297,10 @@ def delete_workspace(w: str, request: Request, current=Depends(user), db=Depends
     workspace = owned_workspace(db, current.id, w)
     keys = list(db.scalars(select(Document.storage_key).where(Document.workspace_id == w)))
     keys.extend(db.scalars(select(GeneratedReport.storage_key).where(GeneratedReport.workspace_id == w)))
+    for key in keys:
+        storage(request.app.state.settings).delete(key)
     db.delete(workspace)
     db.commit()
-    for key in keys:
-        (request.app.state.settings.storage_dir / key).unlink(missing_ok=True)
 
 
 @router.get('/workspaces/{w}/documents')
@@ -327,7 +332,7 @@ async def upload(
         raise HTTPException(413, f'File exceeds the {settings.max_upload_mb} MB upload limit.')
     name = sanitize_filename(file.filename or '')
     mime = validate_upload(data, name, file.content_type or '')
-    doc, job = add_document(db, settings, w, name, data, mime)
+    doc, job = await run_in_threadpool(add_document, db, settings, w, name, data, mime)
     request.app.state.processor.submit(job.id)
     return document_json(db, doc)
 
@@ -340,11 +345,11 @@ def document(w: str, d: str, current=Depends(user), db=Depends(session)):
 @router.get('/workspaces/{w}/documents/{d}/file')
 def document_file(w: str, d: str, request: Request, current=Depends(user), db=Depends(session)):
     doc = owned_document(db, current.id, w, d)
-    return FileResponse(
-        request.app.state.settings.storage_dir / doc.storage_key,
+    disposition = 'inline' if doc.media_type == 'application/pdf' else 'attachment'
+    return Response(
+        storage(request.app.state.settings).read(doc.storage_key),
         media_type=doc.media_type,
-        filename=doc.name,
-        content_disposition_type='inline' if doc.media_type == 'application/pdf' else 'attachment',
+        headers={'Content-Disposition': f"{disposition}; filename*=UTF-8''{quote(doc.name)}"},
     )
 
 
@@ -354,12 +359,12 @@ def delete_document(w: str, d: str, request: Request, current=Depends(user), db=
     # Reports and answers may quote deleted sources. Purge workspace derived snapshots.
     reports = list(db.scalars(select(GeneratedReport).where(GeneratedReport.workspace_id == w)))
     keys = [doc.storage_key] + [report.storage_key for report in reports]
+    for key in keys:
+        storage(request.app.state.settings).delete(key)
     db.execute(delete(GeneratedReport).where(GeneratedReport.workspace_id == w))
     db.execute(delete(ChatSession).where(ChatSession.workspace_id == w))
     db.delete(doc)
     db.commit()
-    for key in keys:
-        (request.app.state.settings.storage_dir / key).unlink(missing_ok=True)
 
 
 @router.get('/workspaces/{w}/jobs/{j}')
@@ -593,11 +598,12 @@ def citation_preview(
         raise HTTPException(415, 'Original page previews are available for PDF documents.')
     if not verify_citation(payload.model_dump(), [document_json(db, doc, True)]):
         raise HTTPException(422, 'The requested highlight could not be verified against the source.')
-    with fitz.open(request.app.state.settings.storage_dir / doc.storage_key) as pdf:
+    with fitz.open(stream=storage(request.app.state.settings).read(doc.storage_key), filetype='pdf') as pdf:
         if payload.page > len(pdf):
             raise HTTPException(422, 'The cited PDF page does not exist.')
         page = pdf[payload.page - 1]
-        scale = min(1.5, 1800 / max(page.rect.width, page.rect.height))
+        edge = 900 if request.app.state.settings.serverless else 1800
+        scale = min(1.5, edge / max(page.rect.width, page.rect.height))
         if payload.bbox:
             page.draw_rect(
                 fitz.Rect(payload.bbox),
@@ -640,9 +646,9 @@ def report(w: str, payload: ReportInput, request: Request, current=Depends(user)
         workspace_json(db, workspace), docs, payload.objective, payload.notes, obligations_json(db, w)
     )
     content = generate_report(sections, payload.format)
-    path = request.app.state.settings.storage_dir / key
+    store = storage(request.app.state.settings)
     try:
-        path.write_bytes(content)
+        store.write(key, content)
         report = GeneratedReport(
             id=identifier,
             workspace_id=w,
@@ -655,7 +661,7 @@ def report(w: str, payload: ReportInput, request: Request, current=Depends(user)
         db.commit()
     except Exception:
         db.rollback()
-        path.unlink(missing_ok=True)
+        store.delete(key)
         raise
     return report_json(report)
 
@@ -673,10 +679,10 @@ def download_report(w: str, r: str, request: Request, current=Depends(user), db=
         if report.format == 'pdf'
         else 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     )
-    return FileResponse(
-        request.app.state.settings.storage_dir / report.storage_key,
+    return Response(
+        storage(request.app.state.settings).read(report.storage_key),
         media_type=mime,
-        filename=f'legallens-consultation.{report.format}',
+        headers={'Content-Disposition': f'attachment; filename="legallens-consultation.{report.format}"'},
     )
 
 
@@ -713,3 +719,18 @@ def seed_demo(request: Request, current=Depends(user), db=Depends(session)):
             request.app.state.processor.submit(job.id)
         created.append(workspace_json(db, workspace))
     return created
+
+
+@router.post('/workspaces/{w}/jobs/{j}/process')
+def process_job(w: str, j: str, request: Request, current=Depends(user), db=Depends(session)):
+    owned_workspace(db, current.id, w)
+    job = db.scalar(select(AnalysisRun).where(AnalysisRun.id == j, AnalysisRun.workspace_id == w))
+    if not job:
+        raise HTTPException(404, 'Processing job not found.')
+    if job.status in {'ready', 'partially_processed', 'failed'}:
+        return job_json(job)
+    if request.app.state.settings.serverless:
+        expensive(request, current)
+        request.app.state.processor._run(j)
+        db.expire_all()
+    return job_json(db.get(AnalysisRun, j))

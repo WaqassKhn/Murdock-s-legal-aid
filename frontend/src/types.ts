@@ -1,3 +1,8 @@
+export interface Capabilities {
+  max_upload_mb: number;
+  ocr_available: boolean;
+  request_processing: boolean;
+}
 export interface User {
   id: string;
   email: string;
@@ -24,6 +29,7 @@ export interface DocumentRecord {
   created_at: string;
   version: number;
   job_id: string;
+  processing_required?: boolean;
 }
 export interface Page {
   number: number;

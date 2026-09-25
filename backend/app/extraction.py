@@ -66,7 +66,16 @@ def _remove_repeated_margins(pages: list[dict]) -> None:
             page['text'] = '\n'.join(lines)
 
 
-def extract_document(data: bytes, filename: str, media_type: str, ocr_provider=None) -> list[dict]:
+def extract_document(
+    data: bytes,
+    filename: str,
+    media_type: str,
+    ocr_provider=None,
+    *,
+    allow_ocr=True,
+    max_pages=MAX_PAGES,
+    max_text=MAX_TEXT,
+) -> list[dict]:
     if not data or len(data) > MAX_BYTES:
         raise ValueError('Upload a non-empty document no larger than 20 MB.')
     suffix = PurePath(filename).suffix.lower()
@@ -86,8 +95,8 @@ def extract_document(data: bytes, filename: str, media_type: str, ocr_provider=N
         with fitz.open(stream=data, filetype='pdf') as document:
             if document.is_encrypted:
                 raise EncryptedDocumentError('Password-protected PDF')
-            if len(document) > MAX_PAGES:
-                raise ValueError('Documents are limited to 200 pages.')
+            if len(document) > max_pages:
+                raise ValueError(f'Documents are limited to {max_pages} pages.')
             for number, source in enumerate(document, 1):
                 text = source.get_text('text', sort=True)
                 blocks = [
@@ -98,6 +107,18 @@ def extract_document(data: bytes, filename: str, media_type: str, ocr_provider=N
                 needs_ocr = len(re.sub(r'\s', '', text)) < 25
                 quality, warning = 1.0, None
                 if needs_ocr:
+                    if not allow_ocr:
+                        pages.append(
+                            _page(
+                                number,
+                                text,
+                                quality=0.1,
+                                ocr=True,
+                                blocks=blocks,
+                                warning='Scanned page: OCR is unavailable on this deployment. Upload a text-based PDF, DOCX, or TXT copy.',
+                            )
+                        )
+                        continue
                     provider = ocr_provider or tesseract_ocr
                     try:
                         if source.rect.width * source.rect.height * 2.25 > 20_000_000:
@@ -117,8 +138,8 @@ def extract_document(data: bytes, filename: str, media_type: str, ocr_provider=N
                 pages.append(
                     _page(number, text, quality=quality, ocr=needs_ocr, warning=warning, blocks=blocks)
                 )
-                if sum(len(item['text']) for item in pages) > MAX_TEXT:
-                    raise ValueError('Extracted PDF content exceeds 2 million characters.')
+                if sum(len(item['text']) for item in pages) > max_text:
+                    raise ValueError(f'Extracted content exceeds {max_text} characters.')
     elif suffix == '.docx':
         if not data.startswith(b'PK'):
             raise ValueError('The uploaded file does not contain a DOCX signature.')
@@ -176,7 +197,9 @@ def extract_document(data: bytes, filename: str, media_type: str, ocr_provider=N
             )
             for i, text_part in enumerate(text.split('\f'), 1)
         ]
-    if len(pages) > MAX_PAGES or sum(len(x['text']) for x in pages) > MAX_TEXT:
-        raise ValueError('Extracted content exceeds 200 pages or 2 million characters.')
+    if len(pages) > max_pages or sum(len(page['text']) for page in pages) > max_text:
+        raise ValueError(
+            f'Extracted content exceeds {max_pages} pages or {max_text} characters. Upload a shorter document.'
+        )
     _remove_repeated_margins(pages)
     return pages

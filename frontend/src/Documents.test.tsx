@@ -14,6 +14,45 @@ const workspace: Workspace = {
   is_demo: false,
 };
 describe('document ingestion boundaries', () => {
+  it('uses server upload limits and explains unavailable OCR', async () => {
+    const fetch = vi.fn();
+    vi.stubGlobal('fetch', fetch);
+    render(
+      <Documents
+        capabilities={{ max_upload_mb: 3, ocr_available: false, request_processing: true }}
+        workspace={workspace}
+        documents={[]}
+        onRefresh={async () => {}}
+        onOpen={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+    expect(screen.getByText(/Up to 3 MB each/)).toBeInTheDocument();
+    expect(screen.getByText(/Scanned PDFs need OCR/)).toBeInTheDocument();
+    await userEvent
+      .setup()
+      .upload(
+        screen.getByLabelText('Upload documents'),
+        new File([new Uint8Array(3 * 1024 * 1024 + 1)], 'large.pdf', { type: 'application/pdf' }),
+      );
+    expect(await screen.findByRole('alert')).toHaveTextContent('exceeds the 3 MB limit');
+    expect(fetch).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+  it('prevents uploads until deployment limits are available', () => {
+    render(
+      <Documents
+        capabilities={null}
+        workspace={workspace}
+        documents={[]}
+        onRefresh={async () => {}}
+        onOpen={vi.fn()}
+        onDelete={vi.fn()}
+      />,
+    );
+    expect(screen.getByLabelText('Upload documents')).toBeDisabled();
+  });
+
   it('reports an unsupported file before submitting and keeps the library empty', async () => {
     const refresh = vi.fn(async () => {});
     const user = userEvent.setup({ applyAccept: false });
@@ -21,6 +60,7 @@ describe('document ingestion boundaries', () => {
     vi.stubGlobal('fetch', fetch);
     render(
       <Documents
+        capabilities={{ max_upload_mb: 20, ocr_available: true, request_processing: false }}
         workspace={workspace}
         documents={[]}
         onRefresh={refresh}
@@ -40,6 +80,7 @@ describe('document ingestion boundaries', () => {
   it('makes a partial extraction visible and includes the affected-page warning', () => {
     render(
       <Documents
+        capabilities={{ max_upload_mb: 20, ocr_available: true, request_processing: false }}
         workspace={workspace}
         documents={[
           {

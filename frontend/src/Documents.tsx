@@ -9,16 +9,18 @@ import {
 } from 'lucide-react';
 import { api, errorMessage, formatDate, label, workspacePath } from './api';
 import { Empty, ErrorNotice } from './components';
-import type { DocumentRecord, Workspace } from './types';
+import type { Capabilities, DocumentRecord, Workspace } from './types';
 
 export function Documents({
   workspace,
   documents,
+  capabilities,
   onRefresh,
   onOpen,
   onDelete,
 }: {
   workspace: Workspace;
+  capabilities: Capabilities | null;
   documents: DocumentRecord[];
   onRefresh: () => Promise<void>;
   onOpen: (document: DocumentRecord) => void;
@@ -29,7 +31,7 @@ export function Documents({
     [drag, setDrag] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   async function upload(files: FileList | null) {
-    if (!files?.length) return;
+    if (!files?.length || busy || !capabilities) return;
     setBusy(true);
     setError('');
     const failures: string[] = [];
@@ -38,8 +40,8 @@ export function Documents({
         failures.push(`${file.name}: unsupported format. Use PDF, DOCX, or TXT.`);
         continue;
       }
-      if (file.size > 20 * 1024 * 1024) {
-        failures.push(`${file.name}: exceeds the 20 MB limit.`);
+      if (file.size > capabilities.max_upload_mb * 1024 * 1024) {
+        failures.push(`${file.name}: exceeds the ${capabilities.max_upload_mb} MB limit.`);
         continue;
       }
       try {
@@ -66,7 +68,11 @@ export function Documents({
           {workspace.is_demo && <div className="eyebrow">SYNTHETIC DEMO</div>}
           <h1>Documents</h1>
         </div>
-        <button className="primary" onClick={() => input.current?.click()} disabled={busy}>
+        <button
+          className="primary"
+          onClick={() => input.current?.click()}
+          disabled={busy || !capabilities}
+        >
           <UploadCloud size={17} />
           {busy ? 'Uploading…' : 'Upload documents'}
         </button>
@@ -74,6 +80,7 @@ export function Documents({
       <input
         ref={input}
         aria-label="Upload documents"
+        disabled={busy || !capabilities}
         type="file"
         multiple
         accept=".pdf,.docx,.txt"
@@ -83,7 +90,7 @@ export function Documents({
       {error && <ErrorNotice message={error} onDismiss={() => setError('')} />}
       <button
         className={`upload-zone ${drag ? 'drag' : ''}`}
-        disabled={busy}
+        disabled={busy || !capabilities}
         onClick={() => input.current?.click()}
         onDragOver={(e) => {
           e.preventDefault();
@@ -102,8 +109,20 @@ export function Documents({
         <strong>
           {busy ? 'Adding your documents…' : 'Drop your documents here, or browse files'}
         </strong>
-        <span>PDF, scanned PDF, DOCX, or TXT · Up to 20 MB each</span>
+        <span>
+          {capabilities
+            ? `${capabilities.ocr_available ? 'PDF, scanned PDF' : 'Text-based PDF'}, DOCX, or TXT · Up to ${capabilities.max_upload_mb} MB each`
+            : 'Loading upload limits…'}
+        </span>
       </button>
+      {capabilities && !capabilities.ocr_available && (
+        <p className="field-hint">Scanned PDFs need OCR before upload on this deployment.</p>
+      )}
+      {capabilities?.request_processing && documents.some((d) => d.processing_required) && (
+        <p role="status" className="field-hint">
+          Keep this workspace open while documents process. Pending work resumes when you reopen it.
+        </p>
+      )}
       <div className="section-heading">
         <h2>
           Document library <span className="count">{documents.length}</span>
@@ -142,7 +161,7 @@ export function Documents({
               <div className={`status-badge status-${d.status}`}>
                 {d.status === 'ready' ? (
                   <CheckCircle2 size={14} />
-                ) : ['uploaded', 'extracting', 'indexing'].includes(d.status) ? (
+                ) : ['uploaded', 'extracting', 'indexing', 'analyzing'].includes(d.status) ? (
                   <LoaderCircle size={14} className="spin" />
                 ) : null}
                 {label(d.status)}

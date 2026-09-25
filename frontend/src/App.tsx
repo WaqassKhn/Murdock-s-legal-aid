@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { api, ApiError, errorMessage, workspacePath } from './api';
+import { useRequestProcessing } from './useRequestProcessing';
 import { Auth } from './Auth';
 import { WorkspaceHome } from './WorkspaceHome';
 import { Documents } from './Documents';
@@ -27,7 +28,7 @@ import { Obligations } from './Obligations';
 import { Reports } from './Reports';
 import { CitationDialog } from './SourceViewer';
 import { Disclaimer, Empty, ErrorNotice, Loading, Modal } from './components';
-import type { Citation, DocumentRecord, User, View, Workspace } from './types';
+import type { Capabilities, Citation, DocumentRecord, User, View, Workspace } from './types';
 
 const navigation = [
   { name: 'Workspaces', icon: LayoutDashboard },
@@ -55,7 +56,16 @@ export default function App() {
       name: string;
     } | null>(null),
     [busy, setBusy] = useState(false),
-    [privacy, setPrivacy] = useState(false);
+    [privacy, setPrivacy] = useState(false),
+    [capabilities, setCapabilities] = useState<Capabilities | null>(null);
+  const resumeProcessing = useRequestProcessing(setError);
+  useEffect(() => {
+    api<Capabilities>('/capabilities')
+      .then(setCapabilities)
+      .catch((e) =>
+        setError(`Cannot load upload limits. Refresh to try again. ${errorMessage(e)}`),
+      );
+  }, []);
   const active = workspaces.find((w) => w.id === activeId);
   const activeIdRef = useRef(activeId);
   useEffect(() => {
@@ -69,8 +79,9 @@ export default function App() {
     const data = await api<DocumentRecord[]>(`${workspacePath(activeId)}/documents`);
     if (activeIdRef.current !== activeId) return;
     setDocuments(data);
+    resumeProcessing(activeId, data);
     setDocumentId((current) => (data.some((d) => d.id === current) ? current : data[0]?.id || ''));
-  }, [activeId]);
+  }, [activeId, resumeProcessing]);
   useEffect(() => {
     api<User>('/auth/me')
       .then(setUser)
@@ -331,6 +342,7 @@ export default function App() {
                 <Documents
                   workspace={active}
                   documents={documents}
+                  capabilities={capabilities}
                   onRefresh={async () => {
                     await refreshDocuments();
                     await refreshWorkspaces();

@@ -43,6 +43,10 @@ npm run build
 # Restart the backend after building, then open http://localhost:8000
 ```
 
+## Free-tier Vercel + Supabase
+
+For a hosted submission without a local Docker process, follow [the Vercel deployment guide](docs/VERCEL.md). Use the repository root, not `frontend`, as the Vercel project root. This serverless path supports text PDFs/DOCX/TXT up to 3 MB; scans need a text-based copy.
+
 ## Docker Compose
 
 Copy `.env.example` to `.env`, set `POSTGRES_PASSWORD` to a unique URL-safe value (for example a generated 32-byte hex string), then:
