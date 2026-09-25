@@ -327,9 +327,26 @@ class GenerativeProvider(OpenAICompatibleProvider):
         for item in draft.changes:
             if set(item.explanation.evidence_ids) != allowed[item.finding_id]:
                 raise ValueError('Comparison must cite the exact versions being compared')
-        self.check([c.explanation for c in draft.changes], evidence, comparison_context=rows)
-        explanations = {c.finding_id: c.explanation.text for c in draft.changes}
-        return [{**f, 'explanation': explanations[f['id']]} for f in findings]
+        rejected = self.check(
+            [c.explanation for c in draft.changes], evidence, comparison_context=rows, partial=True
+        )
+        if len(rejected) == len(draft.changes):
+            raise ValueError('No generated comparison interpretation could be grounded in its evidence')
+        explanations = {
+            c.finding_id: c.explanation.text for i, c in enumerate(draft.changes) if i not in rejected
+        }
+        return [
+            {**f, 'explanation': explanations[f['id']]}
+            if f['id'] in explanations
+            else {
+                **f,
+                'warning': (
+                    f.get('warning', '')
+                    + ' AI explanation omitted after evidence checks. Showing deterministic source differences for this change.'
+                ).strip(),
+            }
+            for f in findings
+        ]
 
 
 def generation_signature(settings) -> str:

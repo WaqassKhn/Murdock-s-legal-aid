@@ -96,11 +96,14 @@ def run(base_url: str) -> dict:
                 f'workspaces/{nda["id"]}/compare',
                 json={'left_id': versions[0]['id'], 'right_id': versions[1]['id']},
             ).json()
-            result['checks']['generated_comparison'] = comparison[
-                'mode'
-            ] == 'AI-generated comparison · evidence checked' and bool(comparison['findings'])
+            result['checks']['generated_comparison'] = comparison['mode'].startswith(
+                'AI-generated comparison · evidence checked'
+            ) and bool(comparison['findings'])
+            result['checks']['comparison_mixed'] = 'mixed' in comparison['mode']
             result['passed'] = all(
-                v for k, v in result['checks'].items() if k not in ('generated_documents', 'total_documents')
+                v
+                for k, v in result['checks'].items()
+                if k not in ('generated_documents', 'total_documents', 'comparison_mixed')
             )
         except (httpx.HTTPError, ValueError, KeyError, AssertionError, StopIteration) as error:
             result['error_type'] = type(error).__name__

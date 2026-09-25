@@ -48,5 +48,5 @@ GitHub Actions final container check was pending at handoff preparation; use the
 - [x] Preserve exact canonical citations, deterministic facts and numeric checks; add fallible model support review with explicit partial/failure states.
 - [x] Expose reanalysis for existing documents and invalidate local/model/prompt cache signatures.
 - [x] Independent review passed; addressed version-direction review context and provider-label findings.
-- [ ] Finish live API, final regression/build checks and publish the updated submission source.
-Next / upcoming task: complete final live workflow and release verification.
+- [x] Finish live API and container regression checks: 78 PostgreSQL/OCR tests and live Gemini workflow passed; final comparison review passed.
+Next / upcoming task: publish the verified comparison fix and verify its public clone and CI.

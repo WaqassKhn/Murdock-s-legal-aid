@@ -534,6 +534,8 @@ def compare(w: str, payload: CompareInput, request: Request, current=Depends(use
         try:
             findings = generator.compare(findings)
             mode = 'AI-generated comparison · evidence checked'
+            if any('AI explanation omitted' in f.get('warning', '') for f in findings):
+                mode += ' · mixed with local differences'
         except (RuntimeError, ValueError):
             raise HTTPException(
                 502, 'AI comparison was unavailable or failed evidence checks. Retry comparison.'

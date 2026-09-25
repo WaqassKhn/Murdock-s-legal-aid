@@ -71,3 +71,16 @@ Final host backend suite: **75 passed, two OCR skips** (Windows Tesseract absent
 Earlier in this change, the container/PostgreSQL suite passed 75 tests including both real OCR tests; later claim-filter/UI changes require the final CI container rerun. Docker Desktop's engine became unavailable on this host, so the current live app runs directly with Uvicorn on port 8010. Do not claim the final local container rerun occurred while that engine is unavailable.
 
 Independent reviewer rechecked partial rejection, mixed-mode/cache handling, version-direction context and source guards; **Review Gate PASS**, seven focused tests independently passed. The reviewer made no external calls. Hosted semantic checking remains fallible; no production legal correctness guarantee is made.
+
+
+## Final container verification — 2026-09-25
+
+Docker availability restored. Built `legallens:verification` and started the isolated Compose deployment with PostgreSQL and configured Gemini. Application and database health checks passed. `docker compose --project-name legallens-check --env-file .clean-check/container.env -f compose.yaml -f compose.verify.yaml run --rm tests`: **78 passed in 16.77 seconds**, including both real Tesseract OCR tests. Python lint and formatting passed (38 files).
+
+`python evaluation/live_workflow.py --base-url http://127.0.0.1:8010 --confirm-external-processing`: **PASS in 30.0 seconds** against the production container. All four synthetic documents received generated analysis; cited paraphrased Q&A, unsupported abstention, lawyer questions, PDF export and generated comparison passed. No comparison fallback was needed in this run. See `generative-container-result.json`. This supersedes the earlier Docker-unavailable status, not the broader limitations.
+
+A preceding live run rejected one comparison explanation. The final fix omits only rejected generated explanations, retaining explicitly labeled deterministic source differences for those rows. Complete rejection still fails visibly. Independent read-only reviewer: **PASS**, eight focused regression tests passed, no blockers. Model support review remains fallible.
+
+Rollback: revert the final comparison commit and rebuild; no schema or data migration was introduced. The prior GenAI commit `69a0c3c` passed GitHub Actions run `36101063059`; the final follow-up run must be checked separately.
+
+Final production-container Playwright run: **2 passed in 40.9 seconds**, including upload, citation inspection, Q&A, comparison, export and PDF page rendering. Exact configured-secret scan examined 153 staged/history blobs: zero matches (bounded check, not certification).

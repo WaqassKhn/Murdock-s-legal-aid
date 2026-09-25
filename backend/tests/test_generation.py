@@ -159,3 +159,46 @@ def test_comparison_review_receives_version_direction_and_rejects_reversal(monke
                 )
             ]
         )
+
+
+def test_comparison_keeps_supported_changes_and_labels_rejected_ones(monkeypatch):
+    from app.generation import ComparisonDraft, ChangeDraft
+
+    provider = GenerativeProvider('https://example.test', 'synthetic', 'test')
+
+    def structured(task, data, schema):
+        if schema is ComparisonDraft:
+            return ComparisonDraft(
+                changes=[
+                    ChangeDraft(
+                        finding_id='bad', explanation=Claim(text='Invented cost 900.', evidence_ids=[0])
+                    ),
+                    ChangeDraft(
+                        finding_id='good', explanation=Claim(text='The payment is 500.', evidence_ids=[1])
+                    ),
+                ]
+            )
+        return Review(judgments=[Judgment(claim_id=1, supported=True)])
+
+    monkeypatch.setattr(provider, 'structured', structured)
+    results = provider.compare(
+        [
+            dict(
+                id='bad',
+                before='500',
+                after='500',
+                explanation='Local difference',
+                citations=[dict(excerpt='500')],
+            ),
+            dict(
+                id='good',
+                before='500',
+                after='500',
+                explanation='Local difference',
+                citations=[dict(excerpt='500')],
+            ),
+        ]
+    )
+    assert results[0]['explanation'] == 'Local difference'
+    assert 'AI explanation omitted' in results[0]['warning']
+    assert results[1]['explanation'] == 'The payment is 500.'
