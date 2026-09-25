@@ -49,4 +49,6 @@ GitHub Actions final container check was pending at handoff preparation; use the
 - [x] Expose reanalysis for existing documents and invalidate local/model/prompt cache signatures.
 - [x] Independent review passed; addressed version-direction review context and provider-label findings.
 - [x] Finish live API and container regression checks: 78 PostgreSQL/OCR tests and live Gemini workflow passed; final comparison review passed.
-Next / upcoming task: publish the verified comparison fix and verify its public clone and CI.
+- [x] Published runtime commit `fe95824`; unauthenticated fresh clone and size verification passed. GitHub Actions run `36139252153` completed successfully, including final container checks.
+
+Checkpoint: Shipping -> none. Proof, independent review, public access and CI verified. Documentation-only handoff records these results. Next / upcoming task: none — authorized publication sequence complete.

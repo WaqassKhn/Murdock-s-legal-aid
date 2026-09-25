@@ -31,3 +31,18 @@ The complete source is retained locally and in Git. Correct a source issue throu
 Submit the repository URL above to the organizer. This agent has not submitted a competition entry. Publication replaces the earlier historical “not authorized / no remote” entries in implementation ledgers.
 
 Checkpoint: Shipping → none. Commit/push and unauthenticated clone verification complete; CI status is linked separately. Next / upcoming task: none — authorized publication sequence complete.
+
+
+## GenAI submission update — 2026-09-25
+
+Runtime commit `fe95824` was pushed to the same public repository. Gemini now generates explanations, answers, comparison interpretations and lawyer questions; the earlier evidence-selection-only description is historical. Invalid generated comparison rows retain explicitly labeled deterministic differences; complete generation failure remains visible.
+
+An unauthenticated fresh clone of `fe95824` succeeded, and the raw README returned HTTP 200. `python scripts/submission_size.py` in that clone measured **1,054,470 tracked bytes**, **321,829 physical Git object bytes**, **1,508,938 uncompressed reachable-history bytes**, and **1,414,100 bytes for tracked files plus the complete Git directory**. No budget exceeded. The script deliberately does not itself certify public access; that was checked separately.
+
+The cloned backend passed 76 tests with two Windows OCR skips using the already-installed locked environment; both OCR cases passed in the 78-test Docker/PostgreSQL suite. An initial root-directory pytest invocation failed import collection; rerunning from `backend`, as documented in README, passed. The fresh clone's deterministic evaluation passed. Earlier clean dependency installation remains applicable because dependency locks did not change.
+
+Final local evidence: live Gemini container workflow passed in 30 seconds; two production browser tests passed in 40.9 seconds. Independent final comparison review passed, eight focused tests passed. Exact configured-secret scan covered 153 staged/history blobs with zero matches. These checks are bounded and are not legal-accuracy or security certifications.
+
+Final runtime CI: https://github.com/WaqassKhn/Murdock-s-legal-aid/actions/runs/36139252153 . This documentation-only follow-up changes no executable source. Rollback uses a normal revert and image rebuild; no database migration was introduced. No hosted cloud deployment or competition-form submission was performed.
+
+Final runtime GitHub Actions result: **SUCCESS**, including dependency audits, production build, browser integration and Docker/PostgreSQL/real OCR. Proof, independent review and shipping gates passed for the hackathon MVP. Public source handoff complete; submit the repository URL to the organizer.
