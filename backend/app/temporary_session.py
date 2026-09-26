@@ -87,6 +87,19 @@ def create_session_app(secret: str | None = None, settings: Settings | None = No
             raise HTTPException(
                 503, 'Set LEGALLENS_SESSION_SECRET to a random value of at least 32 characters.'
             )
+        model_values = {
+            'LEGALLENS_MODEL_BASE_URL': configured.model_base_url,
+            'LEGALLENS_MODEL_API_KEY': configured.model_api_key,
+            'LEGALLENS_MODEL_NAME': configured.model_name,
+        }
+        if any(model_values.values()) and not all(model_values.values()):
+            missing = ', '.join(name for name, value in model_values.items() if not value)
+            raise HTTPException(
+                503,
+                f'AI configuration is incomplete. Add {missing} in Vercel Environment Variables '
+                'for Production, then redeploy. Alternatively remove all three LEGALLENS_MODEL_* '
+                'variables to use local extraction.',
+            )
         return {'status': 'ok', 'storage': 'temporary browser session'}
 
     @app.get('/api/capabilities')

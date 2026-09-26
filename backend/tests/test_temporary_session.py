@@ -15,6 +15,19 @@ from test_api import CONTRACT
 SECRET = 'test-only-session-secret-with-at-least-32-characters'
 
 
+def test_partial_model_configuration_returns_actionable_error_without_leaking_key():
+    settings = Settings(_env_file=None, model_api_key='private-test-key', model_base_url='', model_name='')
+    with TestClient(create_session_app(SECRET, settings)) as client:
+        for response in [
+            client.get('/health'),
+            client.post('/api/session', json={'path': '/api/auth/me'}),
+        ]:
+            assert response.status_code == 503
+            assert 'LEGALLENS_MODEL_BASE_URL' in response.json()['detail']
+            assert 'LEGALLENS_MODEL_NAME' in response.json()['detail']
+            assert 'private-test-key' not in response.text
+
+
 class BrowserSession:
     def __init__(self):
         self.state = ''
