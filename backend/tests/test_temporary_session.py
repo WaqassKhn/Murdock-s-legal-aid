@@ -15,6 +15,31 @@ from test_api import CONTRACT
 SECRET = 'test-only-session-secret-with-at-least-32-characters'
 
 
+def test_empty_vercel_optional_environment_uses_defaults(monkeypatch):
+    for name in (
+        'SECURE_COOKIES',
+        'MAX_UPLOAD_MB',
+        'MAX_WORKSPACE_DOCUMENTS',
+        'MAX_PAGES',
+        'EXPENSIVE_REQUESTS_PER_MINUTE',
+        'AUTO_MIGRATE',
+        'SERVERLESS',
+    ):
+        monkeypatch.setenv('LEGALLENS_' + name, '')
+    monkeypatch.setenv('LEGALLENS_SESSION_SECRET', SECRET)
+    for name in ('MODEL_API_KEY', 'MODEL_BASE_URL', 'MODEL_NAME'):
+        monkeypatch.setenv('LEGALLENS_' + name, '')
+    settings = Settings(_env_file=None)
+    assert settings.max_pages == 200
+    assert settings.auto_migrate is True
+    assert settings.serverless is False
+    with TestClient(create_session_app()) as client:
+        assert client.get('/health').status_code == 200
+        response = client.post('/api/session', json={'path': '/api/auth/me'})
+        assert response.status_code == 200
+        assert response.json()['status'] == 401
+
+
 def test_partial_model_configuration_returns_actionable_error_without_leaking_key():
     settings = Settings(_env_file=None, model_api_key='private-test-key', model_base_url='', model_name='')
     with TestClient(create_session_app(SECRET, settings)) as client:
