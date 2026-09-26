@@ -1,4 +1,6 @@
 .env
+.env.*
+.vercel/
 pyproject.toml
 .venv/
 .clean-check/

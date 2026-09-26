@@ -43,9 +43,13 @@ npm run build
 # Restart the backend after building, then open http://localhost:8000
 ```
 
-## Free-tier Vercel + Supabase
+## Deploy on Vercel Hobby (no card or extra hosting)
 
-For a hosted submission without a local Docker process, follow [the Vercel deployment guide](docs/VERCEL.md). Use the repository root, not `frontend`, as the Vercel project root. This serverless path supports text PDFs/DOCX/TXT up to 3 MB; scans need a text-based copy.
+1. Commit/push your changes when ready, then **import the public GitHub repository** into a personal Vercel **Hobby** account. Root Directory: repository root (`.`). Framework Preset: **Other**.
+2. **Add environment variables:** only `LEGALLENS_SESSION_SECRET` is required (random, at least 32 characters; generate with `python -c "import secrets; print(secrets.token_hex(32))"`). For optional live Gemini, also add `LEGALLENS_MODEL_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai`, `LEGALLENS_MODEL_API_KEY`, and `LEGALLENS_MODEL_NAME=gemini-3.5-flash-lite`, using an eligible free-quota API project with billing disabled. Keep keys server-side.
+3. **Deploy.** `vercel.json` supplies install/build/output settings and one Python function; retain Fluid Compute. No database account, storage service, Docker or paid upgrade is needed. See [deployment details and limits](docs/VERCEL.md).
+
+This path preserves the interface and uses a **temporary browser session**, not persistent accounts/storage. Refreshing/closing the tab or reaching two hours loses all session data; use one tab and export before leaving. Limits: 1 MiB/file, 30 pages, 30,000 extracted characters, six documents/workspace and a total session budget. OCR is unavailable; use text PDFs, DOCX or TXT. Without model credentials, synthetic demos and uploads use explicitly labeled local extraction, not live AI or cached generation. Free hosting does not provide free model quota. No live deployment is claimed by these instructions.
 
 ## Docker Compose
 

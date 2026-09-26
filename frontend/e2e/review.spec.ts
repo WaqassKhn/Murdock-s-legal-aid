@@ -172,15 +172,13 @@ function syntheticPdf(): Buffer {
 
 test('PDF citation displays its verified original page as an inert image', async ({ page }) => {
   const email = `pdf-${Date.now()}@example.test`;
-  await page.request.post('/api/auth/register', {
-    data: { email, password: 'LegalLens-browser-passphrase-42' },
-  });
-  const response = await page.request.post('/api/workspaces', {
-    data: { name: 'Synthetic PDF evidence' },
-  });
-  const workspace = await response.json();
   await page.goto('/');
-  await page.getByRole('button', { name: 'Synthetic PDF evidence', exact: true }).click();
+  await page.getByLabel('Email address').fill(email);
+  await page.getByLabel('Password', { exact: true }).fill('LegalLens-browser-passphrase-42');
+  await page.getByRole('button', { name: 'Create your account' }).click();
+  await page.getByRole('button', { name: 'New workspace', exact: true }).click();
+  await page.getByLabel('Workspace name').fill('Synthetic PDF evidence');
+  await page.getByRole('button', { name: 'Create workspace', exact: true }).click();
   await page
     .getByLabel('Upload documents', { exact: true })
     .setInputFiles({ name: 'synthetic.pdf', mimeType: 'application/pdf', buffer: syntheticPdf() });
@@ -196,5 +194,8 @@ test('PDF citation displays its verified original page as an inert image', async
     0,
   );
   await page.screenshot({ path: 'test-results/pdf-evidence.png', fullPage: true });
-  await page.request.delete(`/api/workspaces/${workspace.id}`);
+  if (process.env.E2E_TEMPORARY_SESSION === 'true') {
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Create your account' })).toBeVisible();
+  }
 });

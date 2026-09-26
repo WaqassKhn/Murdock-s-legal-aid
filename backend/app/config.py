@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     embedding_model: str = ''
 
     serverless: bool = False
+    temporary_session: bool = False
     supabase_url: str = ''
     supabase_secret_key: str = ''
     supabase_bucket: str = 'legallens-documents'

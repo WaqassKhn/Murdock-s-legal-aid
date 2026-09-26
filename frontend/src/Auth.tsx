@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { ArrowRight, Check, Layers3, Scale, ShieldCheck } from 'lucide-react';
-import { api, errorMessage, json } from './api';
+import { api, errorMessage, json, temporarySession } from './api';
 import { Disclaimer, ErrorNotice } from './components';
 import type { User } from './types';
 
@@ -83,6 +83,14 @@ export function Auth({ onAuthenticated }: { onAuthenticated: (user: User) => voi
       </section>
       <section className="auth-form-panel">
         <div className="auth-form-inner">
+          {temporarySession && (
+            <p role="status">
+              Temporary hackathon demo. Use one tab. Create a session account using an example email
+              and a throwaway password. Nothing is saved across refreshes or tab closure; export
+              results before leaving. Live AI requires the deployment owner’s provider quota.
+              Without it, results are labeled local extraction.
+            </p>
+          )}
           <div className="eyebrow">YOUR REVIEW STARTS HERE</div>
           <h2>{register ? 'A little clarity goes a long way.' : 'Welcome back.'}</h2>
           <p className="muted">

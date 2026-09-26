@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 import threading
 import shutil
+import os
 from starlette.concurrency import run_in_threadpool
 
 from alembic import command
@@ -34,7 +35,7 @@ def migrate(engine):
 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or Settings()
-    if settings.serverless and not settings.testing:
+    if settings.serverless and not settings.testing and not settings.temporary_session:
         if not settings.supabase_url or not settings.supabase_secret_key:
             raise ValueError('Supabase private storage is required for serverless deployment.')
         if not settings.database_url.startswith('postgresql'):
@@ -56,7 +57,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         with initialization_lock:
             if not initialized:
                 if settings.auto_migrate:
-                    migrate(engine)
+                    if settings.temporary_session:
+                        from .database import Base
+
+                        Base.metadata.create_all(engine)
+                    else:
+                        migrate(engine)
                 initialized = True
 
     @asynccontextmanager
@@ -167,4 +173,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     return app
 
 
-app = create_app()
+# The temporary entrypoint creates an isolated app per request, never a global database.
+app = None if os.environ.get('LEGALLENS_TEMPORARY_SESSION') == 'true' else create_app()

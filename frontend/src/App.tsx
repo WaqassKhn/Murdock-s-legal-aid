@@ -16,7 +16,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import { api, ApiError, errorMessage, workspacePath } from './api';
+import { api, ApiError, errorMessage, temporarySession, workspacePath } from './api';
 import { useRequestProcessing } from './useRequestProcessing';
 import { Auth } from './Auth';
 import { WorkspaceHome } from './WorkspaceHome';
@@ -101,11 +101,12 @@ export default function App() {
   }, [activeId, refreshDocuments]);
   useEffect(() => {
     if (!activeId || !user) return;
+    if (temporarySession && !documents.some((d) => d.processing_required)) return;
     const timer = window.setInterval(() => {
       void refreshDocuments().catch((e) => setError(errorMessage(e)));
     }, 3000);
     return () => window.clearInterval(timer);
-  }, [activeId, user, refreshDocuments]);
+  }, [activeId, user, refreshDocuments, documents]);
   function navigate(next: View) {
     setView(next);
     setMobileOpen(false);
@@ -292,6 +293,13 @@ export default function App() {
           id="main-content"
           className={`main-content ${view === 'Analysis' ? 'analysis-content' : ''}`}
         >
+          {temporarySession && (
+            <p role="status" className="connection-error">
+              Temporary hackathon session · Use one tab. Refreshing or closing it loses all
+              accounts, documents and results. Expires after 2 hours. Export what you need. Use
+              synthetic documents.
+            </p>
+          )}
           {active && view !== 'Workspaces' && (
             <div className="workspace-context">
               <button className="text-button muted" onClick={() => navigate('Workspaces')}>
@@ -428,9 +436,9 @@ export default function App() {
             </p>
             <h3>Retention & deletion</h3>
             <p>
-              Documents and generated artifacts are retained until you explicitly delete the
-              document or workspace. Use the deletion controls to remove them from active storage.
-              Deployment administrators must configure their own backup retention.
+              {temporarySession
+                ? 'This session lives only in this tab’s memory and expires after two hours. Refreshing or closing the tab loses all data. Each request temporarily restores working files, then deletes them. There is no server backup or account recovery. Export results before leaving.'
+                : 'Documents and generated artifacts are retained until you explicitly delete the document or workspace. Use the deletion controls to remove them from active storage. Deployment administrators must configure their own backup retention.'}
             </p>
             <h3>Model processing</h3>
             <p>

@@ -7,7 +7,7 @@ import {
   FileText,
   ShieldCheck,
 } from 'lucide-react';
-import { api, errorMessage, workspacePath } from './api';
+import { api, apiFetch, downloadFile, errorMessage, workspacePath } from './api';
 import { ErrorNotice, HighlightedText, Loading, Modal } from './components';
 import type { Citation, DocumentDetail, Page } from './types';
 
@@ -167,6 +167,13 @@ export function CitationDialog({
               href={`/api${workspacePath(workspaceId)}/documents/${document.id}/file#page=${citation.page}`}
               target="_blank"
               rel="noreferrer"
+              onClick={(event) => {
+                event.preventDefault();
+                void downloadFile(
+                  `/api${workspacePath(workspaceId)}/documents/${document.id}/file`,
+                  document.name,
+                ).catch((e) => setError(errorMessage(e)));
+              }}
             >
               Open original
               <ExternalLink size={14} />
@@ -198,7 +205,7 @@ function OriginalPreview({ citation, workspaceId }: { citation: Citation; worksp
   useEffect(() => {
     const controller = new AbortController();
     let objectUrl = '';
-    fetch(`/api${workspacePath(workspaceId)}/citations/preview`, {
+    apiFetch(`/api${workspacePath(workspaceId)}/citations/preview`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },

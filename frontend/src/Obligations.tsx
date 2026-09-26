@@ -9,7 +9,7 @@ import {
   PencilLine,
   RefreshCw,
 } from 'lucide-react';
-import { api, errorMessage, json, workspacePath } from './api';
+import { api, downloadFile, errorMessage, json, workspacePath } from './api';
 import { QuestionList, Timeline } from './ActionSections';
 import { AttentionBadge, Citations, Empty, ErrorNotice, Loading } from './components';
 import type { ActionPlan, Citation, Obligation, Workspace } from './types';
@@ -119,7 +119,18 @@ export function Obligations({
           <h1>Your next steps, in focus.</h1>
         </div>
         <div className="action-exports">
-          <a className="secondary" href={`/api${workspacePath(workspace.id)}/checklist`} download>
+          <a
+            className="secondary"
+            href={`/api${workspacePath(workspace.id)}/checklist`}
+            download
+            onClick={(event) => {
+              event.preventDefault();
+              void downloadFile(
+                `/api${workspacePath(workspace.id)}/checklist`,
+                'legallens-checklist.csv',
+              ).catch((e) => setError(errorMessage(e)));
+            }}
+          >
             <Download size={16} />
             Export checklist
           </a>
@@ -127,6 +138,13 @@ export function Obligations({
             className="primary"
             href={`/api${workspacePath(workspace.id)}/action-plan/export`}
             download
+            onClick={(event) => {
+              event.preventDefault();
+              void downloadFile(
+                `/api${workspacePath(workspace.id)}/action-plan/export`,
+                'legallens-action-plan.md',
+              ).catch((e) => setError(errorMessage(e)));
+            }}
           >
             <Download size={16} />
             Download action plan

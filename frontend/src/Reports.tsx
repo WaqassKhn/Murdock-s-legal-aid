@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { ArrowRight, Check, Download, FileDown, FileText } from 'lucide-react';
-import { api, errorMessage, formatDate, json, workspacePath } from './api';
+import { api, downloadFile, errorMessage, formatDate, json, workspacePath } from './api';
 import { Disclaimer, Empty, ErrorNotice, Loading } from './components';
 import type { Report, Workspace } from './types';
 
@@ -143,13 +143,20 @@ export function Reports({ workspace }: { workspace: Workspace }) {
               <div>
                 <h3>{r.title}</h3>
                 <p>
-                  {formatDate(r.created_at)} · {r.format.toUpperCase()} · AI-generated
+                  {formatDate(r.created_at)} · {r.format.toUpperCase()} · Review export
                 </p>
               </div>
               <a
                 className="secondary"
                 href={`/api${workspacePath(workspace.id)}/reports/${r.id}/download`}
                 download
+                onClick={(event) => {
+                  event.preventDefault();
+                  void downloadFile(
+                    `/api${workspacePath(workspace.id)}/reports/${r.id}/download`,
+                    `LegalLens-report.${r.format}`,
+                  ).catch((e) => setError(errorMessage(e)));
+                }}
               >
                 <Download size={16} />
                 Download
